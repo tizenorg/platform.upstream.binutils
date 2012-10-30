@@ -71,7 +71,12 @@ foreach flags {"" "strip" "--static" "--traditional-format"
 
     # This test can only be run if we have the ld build directory,
     # since we need the object files.
-    if {$ld != "$objdir/ld-new"} {
+    set ldexe $ld
+    set ldparm [string first " " $ld]
+    if { $ldparm > 0 } then {
+	set ldexe [string range $ld 0 $ldparm]
+    }
+    if {$ldexe != "$objdir/ld-new"} {
 	untested $testname
 	continue
     }
