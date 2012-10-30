@@ -36,6 +36,7 @@ set wr "$WINDRES --include-dir $srcdir/$subdir"
 if [file exists "$srcdir/../../winsup/w32api/include"] {
     set wr "$wr --include-dir $srcdir/../../winsup/w32api/include"
 } else {
+    return
     send_log "\nWarning: Assuming windres can find the win32 headers\n\n"
 }
 
