@@ -1436,7 +1436,37 @@ if test x"$LDEMUL_BEFORE_ALLOCATION" != xgld"$EMULATION_NAME"_before_allocation;
   else
     ELF_INTERPRETER_SET_DEFAULT=
   fi
+
+  libpath_nl=
+  for path in $NATIVE_LIB_DIRS; do
+    libpath_nl="$libpath_nl\n$path"
+  done
 fragment <<EOF
+
+static int
+gld${EMULATION_NAME}_is_contained (const char *path, const char *dc)
+{
+  while (*dc)
+    {
+      const char *pc = path;
+
+      while (*dc && *pc && *dc == *pc && *dc != '\n'
+            && *pc != ':' && *dc != '=')
+       {
+         dc++;
+         pc++;
+       }
+      if ((*pc == 0 || *pc == ':') && (*dc == '\n' || *dc == '=' || *dc == 0))
+       return 1;
+
+      while (*dc && *dc != '\n')
+       dc++;
+      if (*dc == '\n')
+       dc++;
+    }
+
+  return 0;
+}
 
 /* used by before_allocation and handle_option. */
 static void 
@@ -1484,7 +1514,7 @@ gld${EMULATION_NAME}_append_to_separated_string (char **to, char *op_arg)
 static void
 gld${EMULATION_NAME}_before_allocation (void)
 {
-  const char *rpath;
+  char *rpath;
   asection *sinterp;
   bfd *abfd;
 
@@ -1500,7 +1530,65 @@ gld${EMULATION_NAME}_before_allocation (void)
      by dynamic linking.  */
   rpath = command_line.rpath;
   if (rpath == NULL)
-    rpath = (const char *) getenv ("LD_RUN_PATH");
+    rpath = getenv ("LD_RUN_PATH");
+
+  if (rpath != NULL && getenv ("SUSE_IGNORED_RPATHS"))
+    {
+      char *dirs = 0;
+      FILE *ldso = fopen (getenv ("SUSE_IGNORED_RPATHS"), "r");
+      if (ldso)
+       {
+         off_t endcur = 0;
+         fseek (ldso, 0, SEEK_END);
+         endcur = ftell (ldso);
+         fseek (ldso, 0, SEEK_SET);
+         dirs = xmalloc (endcur);
+         if (fread (dirs, 1, endcur, ldso) != (size_t) endcur)
+           {
+             free (dirs);
+             dirs = NULL;
+           }
+       }
+      if (dirs)
+       {
+         char *cr;
+         rpath = xstrdup (rpath);
+         cr = rpath; /* cursor read */
+
+         while (*cr)
+            {
+             if (gld${EMULATION_NAME}_is_contained (cr, dirs)
+                 || gld${EMULATION_NAME}_is_contained (cr, "$libpath_nl"))
+               {
+                 char *cc = cr, *cw = cr;
+                 while (*cc && *cc != ':')
+                   cc++;
+                 if (*cc == ':')
+                    {
+                     cc++;
+                     for (; *cc; cc++, cw++)
+                       *cw = *cc;
+                    }
+                  else if (cw > rpath)
+                     cw[-1] = 0;
+
+                 *cw = 0;
+               }
+             else
+               {
+                 while (*cr && *cr != ':')
+                   cr++;
+                 if (*cr == ':')
+                   cr++;
+               }
+           }
+         if (*rpath == '\0')
+           {
+             free (rpath);
+             rpath = NULL;
+           }
+       }
+    }
 
   for (abfd = link_info.input_bfds; abfd; abfd = abfd->link_next)
     if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
