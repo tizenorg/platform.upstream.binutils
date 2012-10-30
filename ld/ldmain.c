@@ -291,6 +291,8 @@ main (int argc, char **argv)
   link_info.pei386_auto_import = -1;
   link_info.spare_dynamic_tags = 5;
   link_info.path_separator = ':';
+  if (getenv ("LD_AS_NEEDED") && atoi(getenv ("LD_AS_NEEDED")) > 0)
+    input_flags.add_DT_NEEDED_for_regular = TRUE;
 
   ldfile_add_arch ("");
   emulation = get_emulation (argc, argv);
