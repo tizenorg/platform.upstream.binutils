@@ -276,6 +276,7 @@ main (int argc, char **argv)
 
   link_info.allow_undefined_version = TRUE;
   link_info.keep_memory = TRUE;
+  link_info.new_dtags = TRUE;
   link_info.combreloc = TRUE;
   link_info.strip_discarded = TRUE;
   link_info.emit_hash = TRUE;
