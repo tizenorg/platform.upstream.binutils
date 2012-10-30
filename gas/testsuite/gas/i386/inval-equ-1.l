@@ -9,6 +9,6 @@ GAS LISTING .*
 [ 	]*3[ 	]+\.equ    bar1,%eax
 [ 	]*4[ 	]+\.equ    bar2,%eax
 [ 	]*5[ 	]+\.globl  bar2
-[ 	]*6[ 	]+\?\?\?\? A1000000 		mov bar1,%eax
-[ 	]*6[ 	]+00
-[ 	]*7[ 	]+\?\?\?\? 89C0     		mov bar2,%eax
+[ 	]*6[ 	]+.*[ 	]+mov bar1,%eax
+[ 	]*6[ 	]+.*
+[ 	]*7[ 	]+.*[ 	]+mov bar2,%eax
