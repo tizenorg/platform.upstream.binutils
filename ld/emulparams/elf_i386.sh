@@ -12,6 +12,11 @@ GENERATE_SHLIB_SCRIPT=yes
 GENERATE_PIE_SCRIPT=yes
 NO_SMALL_DATA=yes
 SEPARATE_GOTPLT="SIZEOF (.got.plt) >= 12 ? 12 : 0"
+
+# Look for 64 bit target libraries in /lib64, /usr/lib64 etc., first.
+case "$EMULATION_NAME" in
+  *64*) LIBPATH_SUFFIX=64 ;;
+esac
 IREL_IN_PLT=
 
 # Linux modify the default library search path to first include
