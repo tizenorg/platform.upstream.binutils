@@ -8,7 +8,7 @@ BuildRequires:  glibc-devel-static
 BuildRequires:  bc
 BuildRequires:  makeinfo
 BuildRequires:  zlib-devel-static
-Version:        2.22
+Version:        2.23.1
 Release:        0
 #
 # RUN_TESTS
