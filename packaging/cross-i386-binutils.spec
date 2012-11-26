@@ -1,23 +1,5 @@
-#
-# spec file for package cross-i386-binutils
-#
-# Copyright (c) 2012 SUSE LINUX Products GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
-
-
-Name:           cross-i386-binutils
-ExcludeArch:    %ix86
+Name:         cross-i386-binutils
+ExcludeArch: %ix86
 %define cross 1
 %define TARGET i586
 BuildRequires:  bison
@@ -29,7 +11,7 @@ BuildRequires:  glibc-devel-static
 BuildRequires:  bc
 BuildRequires:  makeinfo
 BuildRequires:  zlib-devel-static
-Version:        2.22
+Version:        2.23.1
 Release:        0
 #
 # RUN_TESTS
@@ -68,26 +50,7 @@ License:        GFDL-1.3 and GPL-3.0+
 Group:          Development/Tools/Building
 Source:         binutils-%{binutils_version}.tar.bz2
 Source1:        pre_checkin.sh
-Source2:        README.First-for.SuSE.packagers
 Source3:        baselibs.conf
-Patch3:         binutils-skip-rpaths.patch
-Patch4:         s390-biarch.diff
-Patch5:         x86-64-biarch.patch
-Patch6:         unit-at-a-time.patch
-Patch7:         ld-dtags.diff
-Patch8:         ld-relro.diff
-Patch9:         testsuite.diff
-Patch10:        enable-targets-gold.diff
-Patch11:        use-hashtype-both-by-default.diff
-Patch14:        binutils-build-as-needed.diff
-Patch15:        fixup-testcase-perturb.diff
-Patch18:        gold-depend-on-opcodes.diff
-Patch19:        bso12451.diff
-Patch20:        bso13449.diff
-Patch90:        cross-avr-nesc-as.patch
-Patch92:        cross-avr-omit_section_dynsym.patch
-Patch93:        avr-binutils-relocs.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 C compiler utilities: ar, as, gprof, ld, nm, objcopy, objdump, ranlib,
@@ -134,34 +97,11 @@ binutils.
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
 %setup -q -n binutils-%{binutils_version}
-%if !%{test_vanilla}
-%patch3
-%patch4
-%patch5
-%patch6
-%patch7 -p1
-%patch8
-%patch9
-%patch10
-%patch11
-%patch14
-%patch15
-%patch18
-%patch19 -p1
-%patch20 -p1
-%if "%{TARGET}" == "avr"
-cp gas/config/tc-avr.h gas/config/tc-avr-nesc.h
-%patch90
-%patch92
-%patch93 -p1
-%endif
-#
-# test_vanilla
-%endif
-sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 
+sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 %build
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wno-error"
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS |sed -e 's/atom/i686/g'`
 %if 0%{!?cross:1}
 # Building native binutils
 echo "Building native binutils." 
