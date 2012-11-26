@@ -15,5 +15,3 @@ for arch in arm i386 x86_64; do
    echo " done."
 done
 
-osc service localrun format_spec_file
-

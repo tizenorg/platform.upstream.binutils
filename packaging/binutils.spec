@@ -98,6 +98,7 @@ echo "make check will return with %{make_check_handling} in case of testsuite fa
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 %build
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wno-error"
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS |sed -e 's/atom/i686/g'`
 %if 0%{!?cross:1}
 # Building native binutils
 echo "Building native binutils." 
