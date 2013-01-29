@@ -246,8 +246,9 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 ln -sf ../../bin/{ar,as,ld,nm,ranlib,strip} $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 
-#mv $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts $RPM_BUILD_ROOT%{_libdir}
-#ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
+mv $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts $RPM_BUILD_ROOT%{_libdir}
+ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
+
 # Install header files
 make -C libiberty install_to_libdir target_header_dir=/usr/include DESTDIR=$RPM_BUILD_ROOT
 # We want the PIC libiberty.a
@@ -301,11 +302,11 @@ cd $RPM_BUILD_DIR/binutils-%version
 %docs_package
 %post
 "%_sbindir/update-alternatives" --install \
-    "%_bindir/ld" ld "%_bindir/ld.bfd" 2
+    "%_bindir/ld" ld "%_bindir/ld.bfd" 1
 
 %post gold
 "%_sbindir/update-alternatives" --install \
-    "%_bindir/ld" ld "%_bindir/ld.gold" 1
+    "%_bindir/ld" ld "%_bindir/ld.gold" 2
 
 
 %preun
@@ -327,7 +328,7 @@ fi;
 %{_prefix}/%{HOST}/bin/*
 %{_prefix}/%{HOST}/lib/ldscripts
 %ghost %_sysconfdir/alternatives/ld
-#%{_libdir}/ldscripts
+%{_libdir}/ldscripts
 %{_bindir}/*
 %ifarch %gold_archs
 %exclude %{_bindir}/gold
