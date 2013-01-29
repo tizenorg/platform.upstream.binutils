@@ -232,14 +232,19 @@ ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
 make DESTDIR=$RPM_BUILD_ROOT install-info install
 make -C gas/doc DESTDIR=$RPM_BUILD_ROOT install-info-am install-am
 make DESTDIR=$RPM_BUILD_ROOT install-bfd install-opcodes
-# we could eventually use alternatives for /usr/bin/ld
-if test -f $RPM_BUILD_ROOT%{_bindir}/ld.bfd; then
-  rm $RPM_BUILD_ROOT%{_bindir}/ld
-  ln -sf ld.bfd $RPM_BUILD_ROOT%{_bindir}/ld;
+
+if [ ! -f "%buildroot/%_bindir/ld.bfd" ]; then
+  mv "%buildroot/%_bindir"/{ld,ld.bfd};
+else
+  rm -f "%buildroot/%_bindir/ld";
 fi
+mkdir -p "%buildroot/%_sysconfdir/alternatives";
+ln -s "%_bindir/ld" "%buildroot/%_sysconfdir/alternatives/ld";
+ln -s "%_sysconfdir/alternatives/ld" "%buildroot/%_bindir/ld";
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 ln -sf ../../bin/{ar,as,ld,nm,ranlib,strip} $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
+
 #mv $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts $RPM_BUILD_ROOT%{_libdir}
 #ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
 # Install header files
@@ -290,11 +295,28 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/bin/*-c++filt
 %endif
 cd $RPM_BUILD_DIR/binutils-%version
 
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %if 0%{!?cross:1}
 %docs_package
+%post
+"%_sbindir/update-alternatives" --install \
+    "%_bindir/ld" ld "%_bindir/ld.bfd" 2
+
+%post gold
+"%_sbindir/update-alternatives" --install \
+    "%_bindir/ld" ld "%_bindir/ld.gold" 1
+
+
+%preun
+if [ "$1" = 0 ]; then
+    "%_sbindir/update-alternatives" --remove ld "%_bindir/ld.bfd";
+fi;
+
+%preun gold
+if [ "$1" = 0 ]; then
+    "%_sbindir/update-alternatives" --remove ld "%_bindir/ld.gold";
+fi;
+
 %endif
 
 %files 
@@ -303,6 +325,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/%{name}
 %{_prefix}/%{HOST}/bin/*
 %{_prefix}/%{HOST}/lib/ldscripts
+%ghost %_sysconfdir/alternatives/ld
 #%{_libdir}/ldscripts
 %{_bindir}/*
 %ifarch %gold_archs
@@ -319,7 +342,6 @@ rm -rf $RPM_BUILD_ROOT
 %ifarch %gold_archs
 %files gold 
 %defattr(-,root,root)
-%doc gold/NEWS gold/README
 %{_bindir}/gold
 %{_bindir}/ld.gold
 %endif
