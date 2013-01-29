@@ -8,6 +8,7 @@ BuildRequires:  glibc-devel-static
 BuildRequires:  bc
 BuildRequires:  makeinfo
 BuildRequires:  zlib-devel-static
+Requires(pre):  update-alternatives
 Version:        2.23.1
 Release:        0
 #
