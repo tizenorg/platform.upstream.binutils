@@ -1,3 +1,6 @@
+* Sat May 11 2013 Anas Nashif <anas.nashif@intel.com> submit/tizen/20130509.172723@9ec8d4c
+- Set license using %license
+
 * Fri Feb 01 2013 Anas Nashif <anas.nashif@intel.com> upstream/2.23.1@3b4f596
 - Fixed gold installation
 
