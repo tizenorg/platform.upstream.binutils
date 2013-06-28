@@ -49,6 +49,7 @@ Group:          Development/Tools/Building
 Source:         binutils-%{binutils_version}.tar.bz2
 Source1:        pre_checkin.sh
 Source3:        baselibs.conf
+Source1001: 	binutils.manifest
 
 %description
 C compiler utilities: ar, as, gprof, ld, nm, objcopy, objdump, ranlib,
@@ -95,6 +96,7 @@ binutils.
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
 %setup -q -n binutils-%{binutils_version}
+cp %{SOURCE1001} .
 
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 %build
@@ -322,6 +324,7 @@ fi;
 %endif
 
 %files 
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %if 0%{!?cross:1}
 %{_docdir}/%{name}
@@ -343,6 +346,7 @@ fi;
 
 %ifarch %gold_archs
 %files gold 
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_bindir}/gold
 %{_bindir}/ld.gold
@@ -350,6 +354,7 @@ fi;
 
 %if 0%{!?cross:1}
 %files devel
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_prefix}/include/*.h
 %{_libdir}/lib*.*a
