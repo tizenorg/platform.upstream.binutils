@@ -42,11 +42,11 @@ Release:        0
 #
 #
 Url:            http://www.gnu.org/software/binutils/
-%define binutils_version %(echo %version | sed 's/\\.[0-9]\\{8\\}$//')
+#%define binutils_version %(echo %version | sed 's/\\.[0-9]\\{8\\}$//')
 Summary:        GNU Binutils
 License:        GFDL-1.3 and GPL-3.0+
 Group:          Development/Tools/Building
-Source:         binutils-%{binutils_version}.tar.bz2
+Source:         binutils-%{version}.tar.bz2
 Source1:        pre_checkin.sh
 Source3:        baselibs.conf
 Source1001: 	binutils.manifest
@@ -95,7 +95,7 @@ binutils.
 
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
-%setup -q -n binutils-%{binutils_version}
+%setup -q
 cp %{SOURCE1001} .
 
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
