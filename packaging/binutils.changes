@@ -1,3 +1,6 @@
+* Tue Jul 16 2013 Junfeng Dong <junfeng.dong@intel.com> accepted/tizen/20130710.221052@de08955
+- Fix wrong source file name of cross-arm-binutils.
+
 * Thu Jul 11 2013 Junfeng Dong <junfeng.dong@intel.com> accepted/tizen/20130710.221052@5aba908
 - Fix gbs packaging problem and disable manifest file for cross toolchain.
 

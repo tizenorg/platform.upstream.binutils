@@ -95,7 +95,7 @@ binutils.
 
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
-%setup -q
+%setup -q -n binutils-%{version}
 cp %{SOURCE1001} .
 
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
