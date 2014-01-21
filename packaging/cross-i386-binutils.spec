@@ -23,7 +23,7 @@ Release:        0
 #
 # handle test suite failures
 #
-%ifarch alpha %arm hppa mips sh4 %sparc
+%ifarch alpha %arm aarch64 hppa mips sh4 %sparc
 %define	make_check_handling	true
 %else
 # XXX check again
@@ -35,12 +35,12 @@ Release:        0
 %define	make_check_handling	false
 %endif
 # handle all binary object formats supported by SuSE (and a few more)
-%ifarch %ix86 %arm ia64 ppc ppc64 s390 s390x x86_64
+%ifarch %ix86 %arm aarch64 ia64 ppc ppc64 s390 s390x x86_64
 %define build_multitarget 1
 %else
 %define build_multitarget 0
 %endif
-%define target_list alpha armv5l armv7l armv8l hppa hppa64 i686 ia64 m68k mips powerpc powerpc64 s390 s390x sh4 sparc sparc64 x86_64
+%define target_list aarch64 alpha armv5l armv7l armv8l hppa hppa64 i686 ia64 m68k mips powerpc powerpc64 s390 s390x sh4 sparc sparc64 x86_64
 #
 #
 #
@@ -65,7 +65,7 @@ License:        GPL-3.0+
 Group:          Development/Tools/Building
 Requires:       binutils = %{version}-%{release}
 %if 0%{!?cross:1}
-%define gold_archs %ix86 %arm x86_64 ppc ppc64 %sparc
+%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
 %endif
 
 %description gold
@@ -132,6 +132,9 @@ EXTRA_TARGETS="$EXTRA_TARGETS,spu-elf"
 %ifarch %arm
 EXTRA_TARGETS="$EXTRA_TARGETS,arm-tizen-linux-gnueabi"
 %endif
+%ifarch aarch64
+EXTRA_TARGETS="$EXTRA_TARGETS,aarch64-tizen-linux"
+%endif
 %endif
 %define common_flags CFLAGS="${RPM_OPT_FLAGS}" CXXFLAGS="${RPM_OPT_FLAGS}" \\\
 	--prefix=%{_prefix} --libdir=%{_libdir} \\\
@@ -181,6 +184,9 @@ EXTRA_TARGETS="$EXTRA_TARGETS,hppa64-tizen-linux"
 %endif
 %if "%{TARGET}" == "arm"
 EXTRA_TARGETS="$EXTRA_TARGETS,arm-tizen-linux-gnueabi"
+%endif
+%if "%{TARGET}" == "aarch64"
+EXTRA_TARGETS="$EXTRA_TARGETS,aarch64-tizen-linux"
 %endif
 %if "%{TARGET}" == "avr" || "%{TARGET}" == "spu"
 TARGET_OS=%{TARGET}
