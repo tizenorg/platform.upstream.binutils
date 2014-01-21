@@ -2,7 +2,7 @@
 
 # the script takes binutils* and creates the cross-* packages
 # sh4 is stuck in the testsuite
-for arch in arm i386 x86_64; do 
+for arch in arm aarch64 i386 x86_64; do 
 
    echo -n "Building package for $arch --> cross-$arch-binutils ..."
 
