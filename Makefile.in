@@ -47061,6 +47061,14 @@ all-stage3-gold: maybe-all-stage3-bfd
 all-stage4-gold: maybe-all-stage4-bfd
 all-stageprofile-gold: maybe-all-stageprofile-bfd
 all-stagefeedback-gold: maybe-all-stagefeedback-bfd
+all-gold: maybe-all-opcodes
+
+all-stage1-gold: maybe-all-stage1-opcodes
+all-stage2-gold: maybe-all-stage2-opcodes
+all-stage3-gold: maybe-all-stage3-opcodes
+all-stage4-gold: maybe-all-stage4-opcodes
+all-stageprofile-gold: maybe-all-stageprofile-opcodes
+all-stagefeedback-gold: maybe-all-stagefeedback-opcodes
 all-gold: maybe-all-build-bison
 
 all-stage1-gold: maybe-all-build-bison

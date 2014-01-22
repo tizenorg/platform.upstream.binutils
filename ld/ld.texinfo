@@ -2117,7 +2117,7 @@ systems may not understand them. If you specify
 @option{--enable-new-dtags}, the new dynamic tags will be created as needed
 and older dynamic tags will be omitted.
 If you specify @option{--disable-new-dtags}, no new dynamic tags will be
-created. By default, the new dynamic tags are not created. Note that
+created. By default, the new dynamic tags are created. Note that
 those options are only available for ELF systems.
 
 @kindex --hash-size=@var{number}

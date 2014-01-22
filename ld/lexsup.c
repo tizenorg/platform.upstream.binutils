@@ -619,6 +619,9 @@ parse_args (unsigned argc, char **argv)
 	}
     }
 
+  optarg = "relro";
+  ldemul_handle_option ('z');
+
   last_optind = -1;
   while (1)
     {

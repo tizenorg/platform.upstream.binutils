@@ -19,6 +19,9 @@
 # Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+# Too fragile.
+return
+
 # Get the offset from an S-record line to the start of the data.
 
 proc srec_off { l } {
