@@ -276,9 +276,11 @@ main (int argc, char **argv)
 
   link_info.allow_undefined_version = TRUE;
   link_info.keep_memory = TRUE;
+  link_info.new_dtags = TRUE;
   link_info.combreloc = TRUE;
   link_info.strip_discarded = TRUE;
   link_info.emit_hash = TRUE;
+  link_info.emit_gnu_hash = TRUE;
   link_info.callbacks = &link_callbacks;
   link_info.input_bfds_tail = &link_info.input_bfds;
   /* SVR4 linkers seem to set DT_INIT and DT_FINI based on magic _init
@@ -289,6 +291,8 @@ main (int argc, char **argv)
   link_info.pei386_auto_import = -1;
   link_info.spare_dynamic_tags = 5;
   link_info.path_separator = ':';
+  if (getenv ("LD_AS_NEEDED") && atoi(getenv ("LD_AS_NEEDED")) > 0)
+    input_flags.add_DT_NEEDED_for_regular = TRUE;
 
   ldfile_add_arch ("");
   emulation = get_emulation (argc, argv);

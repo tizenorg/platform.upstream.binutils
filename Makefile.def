@@ -423,6 +423,7 @@ dependencies = { module=configure-gold; on=configure-intl; };
 dependencies = { module=all-gold; on=all-libiberty; };
 dependencies = { module=all-gold; on=all-intl; };
 dependencies = { module=all-gold; on=all-bfd; };
+dependencies = { module=all-gold; on=all-opcodes; };
 dependencies = { module=all-gold; on=all-build-bison; };
 dependencies = { module=all-gold; on=all-gas; };
 dependencies = { module=check-gold; on=all-binutils; };
