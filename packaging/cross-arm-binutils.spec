@@ -12,7 +12,7 @@ BuildRequires:  bc
 BuildRequires:  makeinfo
 BuildRequires:  zlib-devel-static
 Requires(pre):  update-alternatives
-Version:        2.23.1
+Version:        2.24.51
 Release:        0
 #
 # RUN_TESTS
