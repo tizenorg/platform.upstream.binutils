@@ -1,5 +1,3 @@
-aarch64-reloc-property.cc
-aarch64-reloc-property.h
 aarch64.cc
 archive.cc
 archive.h

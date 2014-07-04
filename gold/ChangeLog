@@ -40,6 +40,10 @@
 	(Target_aarch64::Relocate::relocate): Implement a few relocations.
 	(Target_aarch64::relocate_section): Implement contents.
 
+2014-07-04  Alan Modra  <amodra@gmail.com>
+
+	* po/POTFILES.in: Regenerate.
+
 2014-07-02  Jing Yu  <jingyu@google.com>
 
 	* aarch64.cc: New file
