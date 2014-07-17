@@ -48,7 +48,7 @@ Url:            http://www.gnu.org/software/binutils/
 #%define binutils_version %(echo %version | sed 's/\\.[0-9]\\{8\\}$//')
 Summary:        GNU Binutils
 License:        GFDL-1.3 and GPL-3.0+
-Group:          Development/Tools/Building
+Group:          Development/Building
 Source:         binutils-%{version}.tar.bz2
 Source1:        pre_checkin.sh
 Source3:        baselibs.conf
@@ -62,7 +62,7 @@ to compile a program or kernel.
 %package gold
 Summary:        The gold linker
 License:        GPL-3.0+
-Group:          Development/Tools/Building
+Group:          Development/Building
 Requires:       binutils = %{version}-%{release}
 %if 0%{!?cross:1}
 %define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
@@ -77,7 +77,7 @@ a drop-in replacement for the older GNU linker.
 %package devel
 Summary:        GNU binutils (BFD development files)
 License:        GPL-3.0+
-Group:          Development/Libraries/C and C++
+Group:          Development/Building
 Requires:       binutils = %{version}-%{release}
 Requires:       zlib-devel
 Provides:       binutils:/usr/include/bfd.h
@@ -98,6 +98,13 @@ binutils.
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
 %setup -q -n binutils-%{version}
+
+%if 0%{!?cross:1}
+%ifarch %arm
+ulimit -Hs unlimited
+ulimit -s unlimited
+%endif
+%endif
 
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 %build
@@ -146,6 +153,12 @@ EXTRA_TARGETS="$EXTRA_TARGETS,aarch64-tizen-linux"
 	--with-pic --build=%{HOST} 
 mkdir build-dir
 cd build-dir
+
+%ifarch %arm
+export CONFIG_SHELL="/bin/bash"
+export SHELL="/bin/bash"
+%endif
+
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
 	--enable-plugins \
