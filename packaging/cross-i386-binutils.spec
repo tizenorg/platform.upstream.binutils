@@ -65,7 +65,7 @@ License:        GPL-3.0+
 Group:          Development/Building
 Requires:       binutils = %{version}-%{release}
 %if 0%{!?cross:1}
-%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
+%define gold_archs %ix86 %arm x86_64 ppc ppc64 %sparc
 %endif
 
 %description gold
