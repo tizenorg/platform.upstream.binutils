@@ -1,7 +1,5 @@
 /* tc-sh.c -- Assemble code for the Renesas / SuperH SH
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler.
 
@@ -767,9 +765,10 @@ sh_check_fixup (expressionS *main_exp, bfd_reloc_code_real_type *r_type_p)
 /* Add expression EXP of SIZE bytes to offset OFF of fragment FRAG.  */
 
 void
-sh_cons_fix_new (fragS *frag, int off, int size, expressionS *exp)
+sh_cons_fix_new (fragS *frag, int off, int size, expressionS *exp,
+		 bfd_reloc_code_real_type r_type)
 {
-  bfd_reloc_code_real_type r_type = BFD_RELOC_UNUSED;
+  r_type = BFD_RELOC_UNUSED;
 
   if (sh_check_fixup (exp, &r_type))
     as_bad (_("Invalid PIC expression."));
@@ -931,10 +930,11 @@ sh_optimize_expr (expressionS *l, operatorT op, expressionS *r)
 					 symbol_get_frag (r->X_add_symbol),
 					 &frag_off))
     {
-      l->X_add_number -= r->X_add_number;
-      l->X_add_number -= frag_off / OCTETS_PER_BYTE;
-      l->X_add_number += (S_GET_VALUE (l->X_add_symbol)
-			  - S_GET_VALUE (r->X_add_symbol));
+      offsetT symval_diff = S_GET_VALUE (l->X_add_symbol)
+			    - S_GET_VALUE (r->X_add_symbol);
+      subtract_from_result (l, r->X_add_number, r->X_extrabit);
+      subtract_from_result (l, frag_off / OCTETS_PER_BYTE, 0);
+      add_to_result (l, symval_diff, symval_diff < 0);
       l->X_op = O_constant;
       l->X_add_symbol = 0;
       return 1;

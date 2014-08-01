@@ -1,7 +1,5 @@
 /* ld.h -- general linker header file
-   Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU Binutils.
 
@@ -82,7 +80,7 @@ typedef struct name_list {
 name_list;
 
 typedef enum {sort_none, sort_ascending, sort_descending} sort_order;
-  
+
 /* A wildcard specification.  */
 
 typedef enum {
@@ -103,23 +101,6 @@ struct wildcard_list {
   struct wildcard_list *next;
   struct wildcard_spec spec;
 };
-
-struct map_symbol_def {
-  struct bfd_link_hash_entry *entry;
-  struct map_symbol_def *next;
-};
-
-/* The initial part of fat_user_section_struct has to be idential with
-   lean_user_section_struct.  */
-typedef struct fat_user_section_struct {
-  /* For input sections, when writing a map file: head / tail of a linked
-     list of hash table entries for symbols defined in this section.  */
-  struct map_symbol_def *map_symbol_def_head;
-  struct map_symbol_def **map_symbol_def_tail;
-  unsigned long map_symbol_def_count;
-} fat_section_userdata_type;
-
-#define get_userdata(x) ((x)->userdata)
 
 #define BYTE_SIZE	(1)
 #define SHORT_SIZE	(2)
@@ -148,29 +129,6 @@ typedef struct {
 
   /* 1 => do not assign addresses to common symbols.  */
   bfd_boolean inhibit_common_definition;
-
-  /* Enable or disable target specific optimizations.
-
-     Not all targets have optimizations to enable.
-
-     Normally these optimizations are disabled by default but some targets
-     prefer to enable them by default.  So this field is a tri-state variable.
-     The values are:
-     
-     zero: Enable the optimizations (either from --relax being specified on
-       the command line or the backend's before_allocation emulation function.
-       
-     positive: The user has requested that these optimizations be disabled.
-       (Via the --no-relax command line option).
-
-     negative: The optimizations are disabled.  (Set when initializing the
-       args_type structure in ldmain.c:main.  */
-  signed int disable_target_specific_optimizations;
-#define RELAXATION_DISABLED_BY_DEFAULT (command_line.disable_target_specific_optimizations < 0)
-#define RELAXATION_DISABLED_BY_USER    (command_line.disable_target_specific_optimizations > 0)
-#define RELAXATION_ENABLED (command_line.disable_target_specific_optimizations == 0)
-#define DISABLE_RELAXATION do { command_line.disable_target_specific_optimizations = 1; } while (0)
-#define ENABLE_RELAXATION  do { command_line.disable_target_specific_optimizations = 0; } while (0)
 
   /* If TRUE, build MIPS embedded PIC relocation tables in the output
      file.  */
@@ -296,6 +254,9 @@ typedef struct {
   /* If set, numbers and absolute symbols are simply treated as
      numbers everywhere.  */
   bfd_boolean sane_expr;
+
+  /* If set, code and non-code sections should never be in one segment.  */
+  bfd_boolean separate_code;
 
   /* The rpath separation character.  Usually ':'.  */
   char rpath_separator;

@@ -1,7 +1,5 @@
 /* Print SPARC instructions.
-   Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1989-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU opcodes library.
 
@@ -99,7 +97,7 @@ static char *v9_hpriv_reg_names[] =
   "resv7", "resv8", "resv9", "resv10", "resv11", "resv12", "resv13", 
   "resv14", "resv15", "resv16", "resv17", "resv18", "resv19", "resv20",
   "resv21", "resv22", "resv23", "resv24", "resv25", "resv26", "resv27",
-  "resv28", "resv29", "resv30", "hstick_cmpr"
+  "hstick_offset", "hstick_enable", "resv30", "hstick_cmpr"
 };
 
 /* These are ordered according to there register number in
@@ -223,7 +221,8 @@ compute_arch_mask (unsigned long mach)
     {
     case 0 :
     case bfd_mach_sparc :
-      return SPARC_OPCODE_ARCH_MASK (SPARC_OPCODE_ARCH_V8);
+      return (SPARC_OPCODE_ARCH_MASK (SPARC_OPCODE_ARCH_V8)
+              | SPARC_OPCODE_ARCH_MASK (SPARC_OPCODE_ARCH_LEON));
     case bfd_mach_sparc_sparclet :
       return SPARC_OPCODE_ARCH_MASK (SPARC_OPCODE_ARCH_SPARCLET);
     case bfd_mach_sparc_sparclite :
@@ -338,8 +337,17 @@ compare_opcodes (const void * a, const void * b)
   i = strcmp (op0->name, op1->name);
   if (i)
     {
-      if (op0->flags & F_ALIAS) /* If they're both aliases, be arbitrary.  */
-	return i;
+      if (op0->flags & F_ALIAS)
+	{
+	  if (op0->flags & F_PREFERRED)
+	    return -1;
+	  if (op1->flags & F_PREFERRED)
+	    return 1;
+
+	  /* If they're both aliases, and neither is marked as preferred,
+	     be arbitrary.  */
+	  return i;
+	}
       else
 	fprintf (stderr,
 		 /* xgettext:c-format */

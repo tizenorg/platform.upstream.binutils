@@ -1,5 +1,5 @@
 # This shell script emits a C file. -*- C -*-
-#   Copyright 2006, 2007, 2008, 2009, 2012 Free Software Foundation, Inc.
+#   Copyright (C) 2006-2014 Free Software Foundation, Inc.
 #   Contributed by:
 #   Brain.lin (brain.lin@sunplusct.com)
 #   Mei Ligang (ligang@sunnorth.com.cn)
@@ -38,6 +38,7 @@ gld${EMULATION_NAME}_before_parse ()
 #endif /* not TARGET_ */
   input_flags.dynamic = ${DYNAMIC_LINK-TRUE};
   config.has_shared = `if test -n "$GENERATE_SHLIB_SCRIPT" ; then echo TRUE ; else echo FALSE ; fi`;
+  config.separate_code = `if test "x${SEPARATE_CODE}" = xyes ; then echo TRUE ; else echo FALSE ; fi`;
 }
 
 static void
@@ -74,4 +75,3 @@ LDEMUL_AFTER_OPEN=score_elf_after_open
 
 # Replace the elf before_parse function with our own.
 LDEMUL_BEFORE_PARSE=gld"${EMULATION_NAME}"_before_parse
-

@@ -1,8 +1,5 @@
 /* tc-sparc.c -- Assemble for the SPARC
-   Copyright 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011
-   Free Software Foundation, Inc.
+   Copyright (C) 1989-2014 Free Software Foundation, Inc.
    This file is part of GAS, the GNU Assembler.
 
    GAS is free software; you can redistribute it and/or modify
@@ -221,7 +218,7 @@ static void output_insn (const struct sparc_opcode *, struct sparc_it *);
    for this use.  That table is for opcodes only.  This table is for opcodes
    and file formats.  */
 
-enum sparc_arch_types {v6, v7, v8, sparclet, sparclite, sparc86x, v8plus,
+enum sparc_arch_types {v6, v7, v8, leon, sparclet, sparclite, sparc86x, v8plus,
 		       v8plusa, v9, v9a, v9b, v9_64};
 
 static struct sparc_arch {
@@ -245,8 +242,9 @@ static struct sparc_arch {
   { "sparcfmaf", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF },
   { "sparcima", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF|HWCAP_IMA },
   { "sparcvis3", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF|HWCAP_VIS3|HWCAP_HPC },
-  { "sparc4", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF|HWCAP_VIS3|HWCAP_HPC|HWCAP_RANDOM|HWCAP_TRANS|HWCAP_FJFMAU|HWCAP_AES|HWCAP_DES|HWCAP_KASUMI|HWCAP_CAMELLIA|HWCAP_MD5|HWCAP_SHA1|HWCAP_SHA256|HWCAP_SHA512|HWCAP_MPMUL|HWCAP_MONT|HWCAP_CRC32C|HWCAP_CBCOND|HWCAP_PAUSE },
   { "sparcvis3r", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF|HWCAP_VIS3|HWCAP_HPC|HWCAP_RANDOM|HWCAP_TRANS|HWCAP_FJFMAU },
+  { "sparc4", "v9b", v9, 0, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD|HWCAP_POPC|HWCAP_VIS|HWCAP_VIS2|HWCAP_FMAF|HWCAP_VIS3|HWCAP_HPC|HWCAP_RANDOM|HWCAP_TRANS|HWCAP_FJFMAU|HWCAP_AES|HWCAP_DES|HWCAP_KASUMI|HWCAP_CAMELLIA|HWCAP_MD5|HWCAP_SHA1|HWCAP_SHA256|HWCAP_SHA512|HWCAP_MPMUL|HWCAP_MONT|HWCAP_CRC32C|HWCAP_CBCOND|HWCAP_PAUSE },
+  { "leon", "leon", leon, 32, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD },
   { "sparclet", "sparclet", sparclet, 32, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD },
   { "sparclite", "sparclite", sparclite, 32, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD },
   { "sparc86x", "sparclite", sparc86x, 32, 1, HWCAP_MUL32|HWCAP_DIV32|HWCAP_FSMULD },
@@ -363,7 +361,7 @@ sparc_target_format (void)
  *	-bump
  *		Warn on architecture bumps.  See also -A.
  *
- *	-Av6, -Av7, -Av8, -Asparclite, -Asparclet
+ *	-Av6, -Av7, -Av8, -Aleon, -Asparclite, -Asparclet
  *		Standard 32 bit architectures.
  *	-Av9, -Av9a, -Av9b
  *		Sparc64 in either a 32 or 64 bit world (-32/-64 says which).
@@ -480,10 +478,18 @@ md_parse_option (int c, char *arg)
 
     case OPTION_XARCH:
 #ifdef OBJ_ELF
-      if (strncmp (arg, "v9", 2) != 0)
-	md_parse_option (OPTION_32, NULL);
-      else
+      if (!strncmp (arg, "v9", 2))
 	md_parse_option (OPTION_64, NULL);
+      else
+	{
+	  if (!strncmp (arg, "v8", 2)
+	      || !strncmp (arg, "v7", 2)
+	      || !strncmp (arg, "v6", 2)
+	      || !strcmp (arg, "sparclet")
+	      || !strcmp (arg, "sparclite")
+	      || !strcmp (arg, "sparc86x"))
+	    md_parse_option (OPTION_32, NULL);
+	}
 #endif
       /* Fall through.  */
 
@@ -781,6 +787,8 @@ struct priv_reg_entry hpriv_reg_table[] =
   {"hintp", 3},
   {"htba", 5},
   {"hver", 6},
+  {"hstick_offset", 28},
+  {"hstick_enable", 29},
   {"hstick_cmpr", 31},
   {"", -1},			/* End marker.  */
 };
@@ -2991,7 +2999,7 @@ sparc_ip (char *str, const struct sparc_opcode **pinsn)
 	      return special_case;
 	    }
 
-	  /* Make sure the the hwcaps used by the instruction are
+	  /* Make sure the hwcaps used by the instruction are
 	     currently enabled.  */
 	  if (hwcaps & ~hwcap_allowed)
 	    {
@@ -4260,11 +4268,6 @@ s_proc (int ignore ATTRIBUTE_UNUSED)
 
 static int sparc_no_align_cons = 0;
 
-/* This static variable is set by sparc_cons to emit requested types
-   of relocations in cons_fix_new_sparc.  */
-
-static const char *sparc_cons_special_reloc;
-
 /* This handles the unaligned space allocation pseudo-ops, such as
    .uaword.  .uaword is just like .word, but the value does not need
    to be aligned.  */
@@ -4532,13 +4535,13 @@ sparc_elf_final_processing (void)
     elf_elfheader (stdoutput)->e_flags |= EF_SPARC_SUN_US1|EF_SPARC_SUN_US3;
 }
 
-void
+const char *
 sparc_cons (expressionS *exp, int size)
 {
   char *save;
+  const char *sparc_cons_special_reloc = NULL;
 
   SKIP_WHITESPACE ();
-  sparc_cons_special_reloc = NULL;
   save = input_line_pointer;
   if (input_line_pointer[0] == '%'
       && input_line_pointer[1] == 'r'
@@ -4665,6 +4668,7 @@ sparc_cons (expressionS *exp, int size)
     }
   if (sparc_cons_special_reloc == NULL)
     expression (exp);
+  return sparc_cons_special_reloc;
 }
 
 #endif
@@ -4677,7 +4681,8 @@ void
 cons_fix_new_sparc (fragS *frag,
 		    int where,
 		    unsigned int nbytes,
-		    expressionS *exp)
+		    expressionS *exp,
+		    const char *sparc_cons_special_reloc)
 {
   bfd_reloc_code_real_type r;
 
@@ -4726,7 +4731,6 @@ cons_fix_new_sparc (fragS *frag,
    }
 
   fix_new_exp (frag, where, (int) nbytes, exp, 0, r);
-  sparc_cons_special_reloc = NULL;
 }
 
 void
@@ -4780,9 +4784,7 @@ sparc_regname_to_dw2regnum (char *regname)
 void
 sparc_cfi_emit_pcrel_expr (expressionS *exp, unsigned int nbytes)
 {
-  sparc_cons_special_reloc = "disp";
   sparc_no_align_cons = 1;
-  emit_expr (exp, nbytes);
+  emit_expr_with_reloc (exp, nbytes, "disp");
   sparc_no_align_cons = 0;
-  sparc_cons_special_reloc = NULL;
 }

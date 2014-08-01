@@ -1,6 +1,5 @@
 /* dlltool.c -- tool to generate stuff for PE style DLLs
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2011, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -881,17 +880,18 @@ dlltmp (char **buf, const char *fmt)
 }
 
 static void
-inform VPARAMS ((const char * message, ...))
+inform (const char * message, ...)
 {
-  VA_OPEN (args, message);
-  VA_FIXEDARG (args, const char *, message);
+  va_list args;
+
+  va_start (args, message);
 
   if (!verbose)
     return;
 
   report (message, args);
 
-  VA_CLOSE (args);
+  va_end (args);
 }
 
 static const char *
@@ -1694,10 +1694,12 @@ scan_obj_file (const char *filename)
       bfd *arfile = bfd_openr_next_archived_file (f, 0);
       while (arfile)
 	{
+	  bfd *next;
 	  if (bfd_check_format (arfile, bfd_object))
 	    scan_open_obj_file (arfile);
+	  next = bfd_openr_next_archived_file (f, arfile);
 	  bfd_close (arfile);
-	  arfile = bfd_openr_next_archived_file (f, arfile);
+	  arfile = next;
 	}
 
 #ifdef DLLTOOL_MCORE_ELF
@@ -2276,6 +2278,9 @@ typedef struct
   unsigned char *data;
 } sinfo;
 
+#define INIT_SEC_DATA(id, name, flags, align) \
+        { id, name, flags, align, NULL, NULL, NULL, 0, NULL }
+
 #ifndef DLLTOOL_PPC
 
 #define TEXT 0
@@ -2293,8 +2298,6 @@ typedef struct
 #define DATA_SEC_FLAGS   (SEC_ALLOC | SEC_LOAD | SEC_DATA)
 #define BSS_SEC_FLAGS     SEC_ALLOC
 
-#define INIT_SEC_DATA(id, name, flags, align) \
-        { id, name, flags, align, NULL, NULL, NULL, 0, NULL }
 static sinfo secdata[NSECS] =
 {
   INIT_SEC_DATA (TEXT,   ".text",    TEXT_SEC_FLAGS,   2),
@@ -2324,15 +2327,15 @@ static sinfo secdata[NSECS] =
 
 static sinfo secdata[NSECS] =
 {
-  { TEXT,   ".text",    SEC_CODE | SEC_HAS_CONTENTS, 3},
-  { PDATA,  ".pdata",   SEC_HAS_CONTENTS,            2},
-  { RDATA,  ".reldata", SEC_HAS_CONTENTS,            2},
-  { IDATA5, ".idata$5", SEC_HAS_CONTENTS,            2},
-  { IDATA4, ".idata$4", SEC_HAS_CONTENTS,            2},
-  { IDATA6, ".idata$6", SEC_HAS_CONTENTS,            1},
-  { IDATA7, ".idata$7", SEC_HAS_CONTENTS,            2},
-  { DATA,   ".data",    SEC_DATA,                    2},
-  { BSS,    ".bss",     0,                           2}
+  INIT_SEC_DATA (TEXT,   ".text",    SEC_CODE | SEC_HAS_CONTENTS, 3),
+  INIT_SEC_DATA (PDATA,  ".pdata",   SEC_HAS_CONTENTS,            2),
+  INIT_SEC_DATA (RDATA,  ".reldata", SEC_HAS_CONTENTS,            2),
+  INIT_SEC_DATA (IDATA5, ".idata$5", SEC_HAS_CONTENTS,            2),
+  INIT_SEC_DATA (IDATA4, ".idata$4", SEC_HAS_CONTENTS,            2),
+  INIT_SEC_DATA (IDATA6, ".idata$6", SEC_HAS_CONTENTS,            1),
+  INIT_SEC_DATA (IDATA7, ".idata$7", SEC_HAS_CONTENTS,            2),
+  INIT_SEC_DATA (DATA,   ".data",    SEC_DATA,                    2),
+  INIT_SEC_DATA (BSS,    ".bss",     0,                           2)
 };
 
 #endif

@@ -1,6 +1,5 @@
 /* ldexp.h -
-   Copyright 1991, 1992, 1993, 1994, 1995, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2007, 2011, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU Binutils.
 
@@ -139,6 +138,11 @@ struct ldexp_control {
 
   /* Principally used for diagnostics.  */
   bfd_boolean assigning_to_dot;
+  /* If evaluating an assignment, the destination.  Cleared if an
+     etree_name NAME matches this, to signal a self-assignment.
+     Note that an etree_name DEFINED does not clear this field, nor
+     does the false branch of a trinary expression.  */
+  const char *assign_name;
 
   /* Working results.  */
   etree_value_type result;

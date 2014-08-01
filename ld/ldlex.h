@@ -1,6 +1,5 @@
 /* ldlex.h -
-   Copyright 1991, 1992, 1993, 1994, 1995, 1997, 2000, 2003, 2005, 2006,
-   2007, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU Binutils.
 
@@ -68,6 +67,8 @@ enum option_values
   OPTION_TDATA,
   OPTION_TTEXT,
   OPTION_TTEXT_SEGMENT,
+  OPTION_TRODATA_SEGMENT,
+  OPTION_TLDATA_SEGMENT,
   OPTION_TRADITIONAL_FORMAT,
   OPTION_UR,
   OPTION_VERBOSE,
@@ -135,6 +136,7 @@ enum option_values
 #endif /* ENABLE_PLUGINS */
   OPTION_DEFAULT_SCRIPT,
   OPTION_PRINT_OUTPUT_FORMAT,
+  OPTION_IGNORE_UNRESOLVED_SYMBOL,
 };
 
 /* The initial parser states.  */

@@ -1,7 +1,5 @@
 /* input_file.c - Deal with Input Files -
-   Copyright 1987, 1990, 1991, 1992, 1993, 1994, 1995, 1999, 2000, 2001,
-   2002, 2003, 2005, 2006, 2007, 2009, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1987-2014 Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler.
 
@@ -218,7 +216,7 @@ input_file_get (char *buf, size_t buflen)
 
   if (feof (f_in))
     return 0;
-  
+
   size = fread (buf, sizeof (char), buflen, f_in);
   if (ferror (f_in))
     as_bad (_("can't read from %s: %s"), file_name, xstrerror (errno));

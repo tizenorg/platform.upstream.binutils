@@ -1,7 +1,7 @@
 /* illegal.s Test file for AArch64 instructions that should be rejected
    by the assembler.
 
-   Copyright 2011, 2012 Free Software Foundation, Inc.  Contributed by ARM Ltd.
+   Copyright (C) 2011-2014 Free Software Foundation, Inc.  Contributed by ARM Ltd.
 
    This file is part of GAS.
 
@@ -536,3 +536,28 @@
 	orr	x0, x0, #0xff lsl #1
 
 	mov	x0, ##5
+
+	msr	daifset, x0
+	msr	daifclr, x0
+
+	fmov	s0, #0x11
+	fmov	s0, #0xC0280000C1400000
+	fmov	d0, #0xC02f800000000000
+
+	// No 16-byte relocation
+	ldr	q0, =one_label
+
+	ands	w0, w24, #0xffeefffffffffffd
+
+one_label:
+
+	cinc	w0, w1, al
+	cinc	w0, w1, nv
+	cset	w0, al
+	cset	w0, nv
+	cinv	w0, w1, al
+	cinv	w0, w1, nv
+	csetm	w0, al
+	csetm	w0, nv
+	cneg	w0, w1, al
+	cneg	w0, w1, nv

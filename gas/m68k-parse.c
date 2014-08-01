@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,7 +28,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -47,7 +46,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.3"
+#define YYBISON_VERSION "2.4.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -55,48 +54,21 @@
 /* Pure parsers.  */
 #define YYPURE 0
 
+/* Push parsers.  */
+#define YYPUSH 0
+
+/* Pull parsers.  */
+#define YYPULL 1
+
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
 
 
-/* Tokens.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     DR = 258,
-     AR = 259,
-     FPR = 260,
-     FPCR = 261,
-     LPC = 262,
-     ZAR = 263,
-     ZDR = 264,
-     LZPC = 265,
-     CREG = 266,
-     INDEXREG = 267,
-     EXPR = 268
-   };
-#endif
-/* Tokens.  */
-#define DR 258
-#define AR 259
-#define FPR 260
-#define FPCR 261
-#define LPC 262
-#define ZAR 263
-#define ZDR 264
-#define LZPC 265
-#define CREG 266
-#define INDEXREG 267
-#define EXPR 268
-
-
-
-
 /* Copy the first part of user declarations.  */
-#line 28 "m68k-parse.y"
+
+/* Line 189 of yacc.c  */
+#line 27 "m68k-parse.y"
 
 
 #include "as.h"
@@ -164,6 +136,9 @@ static struct m68k_op *op;
 
 
 
+/* Line 189 of yacc.c  */
+#line 141 "m68k-parse.c"
+
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -182,32 +157,72 @@ static struct m68k_op *op;
 # define YYTOKEN_TABLE 0
 #endif
 
+
+/* Tokens.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     DR = 258,
+     AR = 259,
+     FPR = 260,
+     FPCR = 261,
+     LPC = 262,
+     ZAR = 263,
+     ZDR = 264,
+     LZPC = 265,
+     CREG = 266,
+     INDEXREG = 267,
+     EXPR = 268
+   };
+#endif
+/* Tokens.  */
+#define DR 258
+#define AR 259
+#define FPR 260
+#define FPCR 261
+#define LPC 262
+#define ZAR 263
+#define ZDR 264
+#define LZPC 265
+#define CREG 266
+#define INDEXREG 267
+#define EXPR 268
+
+
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 96 "m68k-parse.y"
 {
+
+/* Line 214 of yacc.c  */
+#line 95 "m68k-parse.y"
+
   struct m68k_indexreg indexreg;
   enum m68k_register reg;
   struct m68k_exp exp;
   unsigned long mask;
   int onereg;
   int trailing_ampersand;
-}
-/* Line 193 of yacc.c.  */
-#line 198 "m68k-parse.c"
-	YYSTYPE;
+
+
+
+/* Line 214 of yacc.c  */
+#line 214 "m68k-parse.c"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 
 /* Copy the second part of user declarations.  */
 
 
-/* Line 216 of yacc.c.  */
-#line 211 "m68k-parse.c"
+/* Line 264 of yacc.c  */
+#line 226 "m68k-parse.c"
 
 #ifdef short
 # undef short
@@ -257,7 +272,7 @@ typedef short int yytype_int16;
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if defined YYENABLE_NLS && YYENABLE_NLS
+# if YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
@@ -282,14 +297,14 @@ typedef short int yytype_int16;
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int i)
+YYID (int yyi)
 #else
 static int
-YYID (i)
-    int i;
+YYID (yyi)
+    int yyi;
 #endif
 {
-  return i;
+  return yyi;
 }
 #endif
 
@@ -370,9 +385,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss;
-  YYSTYPE yyvs;
-  };
+  yytype_int16 yyss_alloc;
+  YYSTYPE yyvs_alloc;
+};
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -406,12 +421,12 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
+	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+	Stack = &yyptr->Stack_alloc;					\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
@@ -533,15 +548,15 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   121,   121,   122,   126,   135,   136,   143,   148,   153,
-     158,   163,   168,   173,   178,   183,   188,   193,   206,   211,
-     216,   221,   231,   241,   251,   256,   261,   266,   273,   284,
-     291,   297,   304,   310,   321,   331,   338,   344,   352,   359,
-     366,   372,   380,   387,   399,   410,   423,   431,   439,   447,
-     457,   464,   472,   479,   493,   494,   507,   508,   520,   521,
-     522,   528,   529,   535,   536,   543,   544,   545,   552,   555,
-     561,   562,   569,   572,   582,   586,   596,   600,   609,   610,
-     614,   626,   630,   631,   635,   642,   652,   656,   660,   664
+       0,   120,   120,   121,   125,   134,   135,   142,   147,   152,
+     157,   162,   167,   172,   177,   182,   187,   192,   205,   210,
+     215,   220,   230,   240,   250,   255,   260,   265,   272,   283,
+     290,   296,   303,   309,   320,   330,   337,   343,   351,   358,
+     365,   371,   379,   386,   398,   409,   422,   430,   438,   446,
+     456,   463,   471,   478,   492,   493,   506,   507,   519,   520,
+     521,   527,   528,   534,   535,   542,   543,   544,   551,   554,
+     560,   561,   568,   571,   581,   585,   595,   599,   608,   609,
+     613,   625,   629,   630,   634,   641,   651,   655,   659,   663
 };
 #endif
 
@@ -817,7 +832,7 @@ while (YYID (0))
    we won't break user code: when these are the locations we know.  */
 
 #ifndef YY_LOCATION_PRINT
-# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+# if YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
      fprintf (File, "%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
@@ -928,17 +943,20 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
+yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
 #else
 static void
-yy_stack_print (bottom, top)
-    yytype_int16 *bottom;
-    yytype_int16 *top;
+yy_stack_print (yybottom, yytop)
+    yytype_int16 *yybottom;
+    yytype_int16 *yytop;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
+  for (; yybottom <= yytop; yybottom++)
+    {
+      int yybot = *yybottom;
+      YYFPRINTF (stderr, " %d", yybot);
+    }
   YYFPRINTF (stderr, "\n");
 }
 
@@ -972,11 +990,11 @@ yy_reduce_print (yyvsp, yyrule)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      fprintf (stderr, "\n");
+      YYFPRINTF (stderr, "\n");
     }
 }
 
@@ -1256,10 +1274,8 @@ yydestruct (yymsg, yytype, yyvaluep)
 	break;
     }
 }
-
 
 /* Prevent warnings from -Wmissing-prototypes.  */
-
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
@@ -1275,11 +1291,10 @@ int yyparse ();
 #endif /* ! YYPARSE_PARAM */
 
 
-
-/* The look-ahead symbol.  */
+/* The lookahead symbol.  */
 int yychar;
 
-/* The semantic value of the look-ahead symbol.  */
+/* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
@@ -1287,9 +1302,9 @@ int yynerrs;
 
 
 
-/*----------.
-| yyparse.  |
-`----------*/
+/*-------------------------.
+| yyparse or yypush_parse.  |
+`-------------------------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -1313,14 +1328,39 @@ yyparse ()
 #endif
 #endif
 {
-  
-  int yystate;
+
+
+    int yystate;
+    /* Number of tokens to shift before error messages enabled.  */
+    int yyerrstatus;
+
+    /* The stacks and their tools:
+       `yyss': related to states.
+       `yyvs': related to semantic values.
+
+       Refer to the stacks thru separate pointers, to allow yyoverflow
+       to reallocate them elsewhere.  */
+
+    /* The state stack.  */
+    yytype_int16 yyssa[YYINITDEPTH];
+    yytype_int16 *yyss;
+    yytype_int16 *yyssp;
+
+    /* The semantic value stack.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs;
+    YYSTYPE *yyvsp;
+
+    YYSIZE_T yystacksize;
+
   int yyn;
   int yyresult;
-  /* Number of tokens to shift before error messages enabled.  */
-  int yyerrstatus;
-  /* Look-ahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead token as an internal (translated) token number.  */
+  int yytoken;
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -1328,51 +1368,28 @@ yyparse ()
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
-  /* Three stacks and their tools:
-     `yyss': related to states,
-     `yyvs': related to semantic values,
-     `yyls': related to locations.
-
-     Refer to the stacks thru separate pointers, to allow yyoverflow
-     to reallocate them elsewhere.  */
-
-  /* The state stack.  */
-  yytype_int16 yyssa[YYINITDEPTH];
-  yytype_int16 *yyss = yyssa;
-  yytype_int16 *yyssp;
-
-  /* The semantic value stack.  */
-  YYSTYPE yyvsa[YYINITDEPTH];
-  YYSTYPE *yyvs = yyvsa;
-  YYSTYPE *yyvsp;
-
-
-
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
-
-  YYSIZE_T yystacksize = YYINITDEPTH;
-
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
+
+  yytoken = 0;
+  yyss = yyssa;
+  yyvs = yyvsa;
+  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY; /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
      so that they stay on the same level as the state stack.
      The wasted elements are never initialized.  */
-
   yyssp = yyss;
   yyvsp = yyvs;
 
@@ -1402,7 +1419,6 @@ yyparse ()
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
-
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -1410,7 +1426,6 @@ yyparse ()
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
-
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -1433,9 +1448,8 @@ yyparse ()
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
-
+	YYSTACK_RELOCATE (yyss_alloc, yyss);
+	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -1446,7 +1460,6 @@ yyparse ()
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -1456,6 +1469,9 @@ yyparse ()
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
+  if (yystate == YYFINAL)
+    YYACCEPT;
+
   goto yybackup;
 
 /*-----------.
@@ -1464,16 +1480,16 @@ yyparse ()
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     look-ahead token if we need one and don't already have one.  */
+     lookahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to look-ahead token.  */
+  /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a look-ahead token if don't already have one.  */
+  /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -1505,20 +1521,16 @@ yybackup:
       goto yyreduce;
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the look-ahead token.  */
+  /* Shift the lookahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token unless it is eof.  */
-  if (yychar != YYEOF)
-    yychar = YYEMPTY;
+  /* Discard the shifted token.  */
+  yychar = YYEMPTY;
 
   yystate = yyn;
   *++yyvsp = yylval;
@@ -1558,45 +1570,59 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 123 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 122 "m68k-parse.y"
     {
 		  op->trailing_ampersand = (yyvsp[(2) - (2)].trailing_ampersand);
 		}
     break;
 
   case 4:
-#line 127 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 126 "m68k-parse.y"
     {
 		  op->trailing_ampersand = (yyvsp[(2) - (2)].trailing_ampersand);
 		}
     break;
 
   case 5:
-#line 135 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 134 "m68k-parse.y"
     { (yyval.trailing_ampersand) = 0; }
     break;
 
   case 6:
-#line 137 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 136 "m68k-parse.y"
     { (yyval.trailing_ampersand) = 1; }
     break;
 
   case 7:
-#line 144 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 143 "m68k-parse.y"
     {
 		  op->mode = LSH;
 		}
     break;
 
   case 8:
-#line 149 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 148 "m68k-parse.y"
     {
 		  op->mode = RSH;
 		}
     break;
 
   case 9:
-#line 154 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 153 "m68k-parse.y"
     {
 		  op->mode = DREG;
 		  op->reg = (yyvsp[(1) - (1)].reg);
@@ -1604,7 +1630,9 @@ yyreduce:
     break;
 
   case 10:
-#line 159 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 158 "m68k-parse.y"
     {
 		  op->mode = AREG;
 		  op->reg = (yyvsp[(1) - (1)].reg);
@@ -1612,7 +1640,9 @@ yyreduce:
     break;
 
   case 11:
-#line 164 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 163 "m68k-parse.y"
     {
 		  op->mode = FPREG;
 		  op->reg = (yyvsp[(1) - (1)].reg);
@@ -1620,7 +1650,9 @@ yyreduce:
     break;
 
   case 12:
-#line 169 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 168 "m68k-parse.y"
     {
 		  op->mode = CONTROL;
 		  op->reg = (yyvsp[(1) - (1)].reg);
@@ -1628,7 +1660,9 @@ yyreduce:
     break;
 
   case 13:
-#line 174 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 173 "m68k-parse.y"
     {
 		  op->mode = CONTROL;
 		  op->reg = (yyvsp[(1) - (1)].reg);
@@ -1636,7 +1670,9 @@ yyreduce:
     break;
 
   case 14:
-#line 179 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 178 "m68k-parse.y"
     {
 		  op->mode = ABSL;
 		  op->disp = (yyvsp[(1) - (1)].exp);
@@ -1644,7 +1680,9 @@ yyreduce:
     break;
 
   case 15:
-#line 184 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 183 "m68k-parse.y"
     {
 		  op->mode = IMMED;
 		  op->disp = (yyvsp[(2) - (2)].exp);
@@ -1652,7 +1690,9 @@ yyreduce:
     break;
 
   case 16:
-#line 189 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 188 "m68k-parse.y"
     {
 		  op->mode = IMMED;
 		  op->disp = (yyvsp[(2) - (2)].exp);
@@ -1660,7 +1700,9 @@ yyreduce:
     break;
 
   case 17:
-#line 194 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 193 "m68k-parse.y"
     {
 		  op->mode = REGLST;
 		  op->mask = (yyvsp[(1) - (1)].mask);
@@ -1668,7 +1710,9 @@ yyreduce:
     break;
 
   case 18:
-#line 207 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 206 "m68k-parse.y"
     {
 		  op->mode = AINDR;
 		  op->reg = (yyvsp[(2) - (3)].reg);
@@ -1676,7 +1720,9 @@ yyreduce:
     break;
 
   case 19:
-#line 212 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 211 "m68k-parse.y"
     {
 		  op->mode = AINC;
 		  op->reg = (yyvsp[(2) - (4)].reg);
@@ -1684,7 +1730,9 @@ yyreduce:
     break;
 
   case 20:
-#line 217 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 216 "m68k-parse.y"
     {
 		  op->mode = ADEC;
 		  op->reg = (yyvsp[(3) - (4)].reg);
@@ -1692,7 +1740,9 @@ yyreduce:
     break;
 
   case 21:
-#line 222 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 221 "m68k-parse.y"
     {
 		  op->reg = (yyvsp[(4) - (5)].reg);
 		  op->disp = (yyvsp[(2) - (5)].exp);
@@ -1705,7 +1755,9 @@ yyreduce:
     break;
 
   case 22:
-#line 232 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 231 "m68k-parse.y"
     {
 		  op->reg = (yyvsp[(2) - (5)].reg);
 		  op->disp = (yyvsp[(4) - (5)].exp);
@@ -1718,7 +1770,9 @@ yyreduce:
     break;
 
   case 23:
-#line 242 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 241 "m68k-parse.y"
     {
 		  op->reg = (yyvsp[(3) - (4)].reg);
 		  op->disp = (yyvsp[(1) - (4)].exp);
@@ -1731,7 +1785,9 @@ yyreduce:
     break;
 
   case 24:
-#line 252 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 251 "m68k-parse.y"
     {
 		  op->mode = DISP;
 		  op->reg = (yyvsp[(2) - (3)].reg);
@@ -1739,7 +1795,9 @@ yyreduce:
     break;
 
   case 25:
-#line 257 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 256 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(2) - (3)].reg);
@@ -1747,7 +1805,9 @@ yyreduce:
     break;
 
   case 26:
-#line 262 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 261 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(2) - (3)].reg);
@@ -1755,7 +1815,9 @@ yyreduce:
     break;
 
   case 27:
-#line 267 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 266 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(4) - (7)].reg);
@@ -1765,7 +1827,9 @@ yyreduce:
     break;
 
   case 28:
-#line 274 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 273 "m68k-parse.y"
     {
 		  if ((yyvsp[(4) - (7)].reg) == PC || (yyvsp[(4) - (7)].reg) == ZPC)
 		    yyerror (_("syntax error"));
@@ -1779,7 +1843,9 @@ yyreduce:
     break;
 
   case 29:
-#line 285 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 284 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(5) - (6)].reg);
@@ -1789,7 +1855,9 @@ yyreduce:
     break;
 
   case 30:
-#line 292 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 291 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->disp = (yyvsp[(4) - (5)].exp);
@@ -1798,7 +1866,9 @@ yyreduce:
     break;
 
   case 31:
-#line 298 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 297 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(3) - (6)].reg);
@@ -1808,7 +1878,9 @@ yyreduce:
     break;
 
   case 32:
-#line 305 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 304 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(2) - (5)].reg);
@@ -1817,7 +1889,9 @@ yyreduce:
     break;
 
   case 33:
-#line 311 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 310 "m68k-parse.y"
     {
 		  if ((yyvsp[(3) - (6)].reg) == PC || (yyvsp[(3) - (6)].reg) == ZPC)
 		    yyerror (_("syntax error"));
@@ -1831,7 +1905,9 @@ yyreduce:
     break;
 
   case 34:
-#line 322 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 321 "m68k-parse.y"
     {
 		  if ((yyvsp[(2) - (5)].reg) == PC || (yyvsp[(2) - (5)].reg) == ZPC)
 		    yyerror (_("syntax error"));
@@ -1844,7 +1920,9 @@ yyreduce:
     break;
 
   case 35:
-#line 332 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 331 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(4) - (5)].reg);
@@ -1854,7 +1932,9 @@ yyreduce:
     break;
 
   case 36:
-#line 339 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 338 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(3) - (4)].reg);
@@ -1863,7 +1943,9 @@ yyreduce:
     break;
 
   case 37:
-#line 345 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 344 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(4) - (9)].reg);
@@ -1874,7 +1956,9 @@ yyreduce:
     break;
 
   case 38:
-#line 353 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 352 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(4) - (7)].reg);
@@ -1884,7 +1968,9 @@ yyreduce:
     break;
 
   case 39:
-#line 360 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 359 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(3) - (8)].reg);
@@ -1894,7 +1980,9 @@ yyreduce:
     break;
 
   case 40:
-#line 367 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 366 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(3) - (6)].reg);
@@ -1903,7 +1991,9 @@ yyreduce:
     break;
 
   case 41:
-#line 373 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 372 "m68k-parse.y"
     {
 		  op->mode = PRE;
 		  op->reg = (yyvsp[(5) - (10)].reg);
@@ -1914,7 +2004,9 @@ yyreduce:
     break;
 
   case 42:
-#line 381 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 380 "m68k-parse.y"
     {
 		  op->mode = PRE;
 		  op->reg = (yyvsp[(3) - (8)].reg);
@@ -1924,7 +2016,9 @@ yyreduce:
     break;
 
   case 43:
-#line 388 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 387 "m68k-parse.y"
     {
 		  if ((yyvsp[(5) - (10)].reg) == PC || (yyvsp[(5) - (10)].reg) == ZPC)
 		    yyerror (_("syntax error"));
@@ -1939,7 +2033,9 @@ yyreduce:
     break;
 
   case 44:
-#line 400 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 399 "m68k-parse.y"
     {
 		  if ((yyvsp[(3) - (8)].reg) == PC || (yyvsp[(3) - (8)].reg) == ZPC)
 		    yyerror (_("syntax error"));
@@ -1953,7 +2049,9 @@ yyreduce:
     break;
 
   case 45:
-#line 411 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 410 "m68k-parse.y"
     {
 		  op->mode = PRE;
 		  op->reg = (yyvsp[(5) - (8)].reg);
@@ -1964,7 +2062,9 @@ yyreduce:
     break;
 
   case 46:
-#line 424 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 423 "m68k-parse.y"
     {
 		  /* We use optzapc to avoid a shift/reduce conflict.  */
 		  if ((yyvsp[(1) - (2)].reg) < ADDR0 || (yyvsp[(1) - (2)].reg) > ADDR7)
@@ -1975,7 +2075,9 @@ yyreduce:
     break;
 
   case 47:
-#line 432 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 431 "m68k-parse.y"
     {
 		  /* We use optzapc to avoid a shift/reduce conflict.  */
 		  if ((yyvsp[(1) - (3)].reg) < ADDR0 || (yyvsp[(1) - (3)].reg) > ADDR7)
@@ -1986,7 +2088,9 @@ yyreduce:
     break;
 
   case 48:
-#line 440 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 439 "m68k-parse.y"
     {
 		  /* We use optzapc to avoid a shift/reduce conflict.  */
 		  if ((yyvsp[(1) - (3)].reg) < ADDR0 || (yyvsp[(1) - (3)].reg) > ADDR7)
@@ -1997,7 +2101,9 @@ yyreduce:
     break;
 
   case 49:
-#line 448 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 447 "m68k-parse.y"
     {
 		  op->reg = (yyvsp[(1) - (5)].reg);
 		  op->disp = (yyvsp[(4) - (5)].exp);
@@ -2010,7 +2116,9 @@ yyreduce:
     break;
 
   case 50:
-#line 458 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 457 "m68k-parse.y"
     {
 		  op->mode = BASE;
 		  op->reg = (yyvsp[(1) - (6)].reg);
@@ -2020,7 +2128,9 @@ yyreduce:
     break;
 
   case 51:
-#line 465 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 464 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(1) - (10)].reg);
@@ -2031,7 +2141,9 @@ yyreduce:
     break;
 
   case 52:
-#line 473 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 472 "m68k-parse.y"
     {
 		  op->mode = POST;
 		  op->reg = (yyvsp[(1) - (9)].reg);
@@ -2041,7 +2153,9 @@ yyreduce:
     break;
 
   case 53:
-#line 480 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 479 "m68k-parse.y"
     {
 		  op->mode = PRE;
 		  op->reg = (yyvsp[(1) - (10)].reg);
@@ -2052,7 +2166,9 @@ yyreduce:
     break;
 
   case 55:
-#line 495 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 494 "m68k-parse.y"
     {
 		  (yyval.indexreg).reg = (yyvsp[(1) - (1)].reg);
 		  (yyval.indexreg).size = SIZE_UNSPEC;
@@ -2061,7 +2177,9 @@ yyreduce:
     break;
 
   case 57:
-#line 509 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 508 "m68k-parse.y"
     {
 		  (yyval.indexreg).reg = (yyvsp[(1) - (1)].reg);
 		  (yyval.indexreg).size = SIZE_UNSPEC;
@@ -2070,28 +2188,36 @@ yyreduce:
     break;
 
   case 68:
-#line 552 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 551 "m68k-parse.y"
     {
 		  (yyval.reg) = ZADDR0;
 		}
     break;
 
   case 72:
-#line 569 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 568 "m68k-parse.y"
     {
 		  (yyval.reg) = ZADDR0;
 		}
     break;
 
   case 73:
-#line 573 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 572 "m68k-parse.y"
     {
 		  (yyval.reg) = (yyvsp[(2) - (2)].reg);
 		}
     break;
 
   case 74:
-#line 582 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 581 "m68k-parse.y"
     {
 		  (yyval.exp).exp.X_op = O_absent;
 		  (yyval.exp).size = SIZE_UNSPEC;
@@ -2099,14 +2225,18 @@ yyreduce:
     break;
 
   case 75:
-#line 587 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 586 "m68k-parse.y"
     {
 		  (yyval.exp) = (yyvsp[(2) - (2)].exp);
 		}
     break;
 
   case 76:
-#line 596 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 595 "m68k-parse.y"
     {
 		  (yyval.exp).exp.X_op = O_absent;
 		  (yyval.exp).size = SIZE_UNSPEC;
@@ -2114,49 +2244,63 @@ yyreduce:
     break;
 
   case 77:
-#line 601 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 600 "m68k-parse.y"
     {
 		  (yyval.exp) = (yyvsp[(1) - (2)].exp);
 		}
     break;
 
   case 79:
-#line 611 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 610 "m68k-parse.y"
     {
 		  (yyval.mask) = (yyvsp[(1) - (3)].mask) | (yyvsp[(3) - (3)].mask);
 		}
     break;
 
   case 80:
-#line 615 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 614 "m68k-parse.y"
     {
 		  (yyval.mask) = (1 << (yyvsp[(1) - (3)].onereg)) | (yyvsp[(3) - (3)].mask);
 		}
     break;
 
   case 81:
-#line 627 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 626 "m68k-parse.y"
     {
 		  (yyval.mask) = 1 << (yyvsp[(1) - (1)].onereg);
 		}
     break;
 
   case 83:
-#line 632 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 631 "m68k-parse.y"
     {
 		  (yyval.mask) = (yyvsp[(1) - (3)].mask) | (yyvsp[(3) - (3)].mask);
 		}
     break;
 
   case 84:
-#line 636 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 635 "m68k-parse.y"
     {
 		  (yyval.mask) = (1 << (yyvsp[(1) - (3)].onereg)) | (yyvsp[(3) - (3)].mask);
 		}
     break;
 
   case 85:
-#line 643 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 642 "m68k-parse.y"
     {
 		  if ((yyvsp[(1) - (3)].onereg) <= (yyvsp[(3) - (3)].onereg))
 		    (yyval.mask) = (1 << ((yyvsp[(3) - (3)].onereg) + 1)) - 1 - ((1 << (yyvsp[(1) - (3)].onereg)) - 1);
@@ -2166,28 +2310,36 @@ yyreduce:
     break;
 
   case 86:
-#line 653 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 652 "m68k-parse.y"
     {
 		  (yyval.onereg) = (yyvsp[(1) - (1)].reg) - DATA0;
 		}
     break;
 
   case 87:
-#line 657 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 656 "m68k-parse.y"
     {
 		  (yyval.onereg) = (yyvsp[(1) - (1)].reg) - ADDR0 + 8;
 		}
     break;
 
   case 88:
-#line 661 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 660 "m68k-parse.y"
     {
 		  (yyval.onereg) = (yyvsp[(1) - (1)].reg) - FP0 + 16;
 		}
     break;
 
   case 89:
-#line 665 "m68k-parse.y"
+
+/* Line 1455 of yacc.c  */
+#line 664 "m68k-parse.y"
     {
 		  if ((yyvsp[(1) - (1)].reg) == FPI)
 		    (yyval.onereg) = 24;
@@ -2199,8 +2351,9 @@ yyreduce:
     break;
 
 
-/* Line 1267 of yacc.c.  */
-#line 2204 "m68k-parse.c"
+
+/* Line 1455 of yacc.c  */
+#line 2357 "m68k-parse.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2210,7 +2363,6 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
-
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -2276,7 +2428,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse look-ahead token after an
+      /* If just tried and failed to reuse lookahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -2293,7 +2445,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse look-ahead token after shifting the error
+  /* Else will try to reuse lookahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -2350,9 +2502,6 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   *++yyvsp = yylval;
 
 
@@ -2377,7 +2526,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#ifndef yyoverflow
+#if !defined(yyoverflow) || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -2388,7 +2537,7 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEOF && yychar != YYEMPTY)
+  if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
 		 yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
@@ -2414,7 +2563,9 @@ yyreturn:
 }
 
 
-#line 675 "m68k-parse.y"
+
+/* Line 1675 of yacc.c  */
+#line 674 "m68k-parse.y"
 
 
 /* The string to parse is stored here, and modified by yylex.  */

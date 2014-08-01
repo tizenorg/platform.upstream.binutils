@@ -1,6 +1,6 @@
 // symtab.cc -- the gold symbol table
 
-// Copyright 2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
+// Copyright (C) 2006-2014 Free Software Foundation, Inc.
 // Written by Ian Lance Taylor <iant@google.com>.
 
 // This file is part of gold.
@@ -334,7 +334,7 @@ Sized_symbol<size>::allocate_common(Output_data* od, Value_type value)
 // Return true if this symbol should be added to the dynamic symbol
 // table.
 
-inline bool
+bool
 Symbol::should_add_dynsym_entry(Symbol_table* symtab) const
 {
   // If the symbol is only present on plugin files, the plugin decided we
@@ -527,6 +527,31 @@ Symbol::set_output_section(Output_section* os)
     }
 }
 
+// Set the symbol's output segment.  This is used for pre-defined
+// symbols whose segments aren't known until after layout is done
+// (e.g., __ehdr_start).
+
+void
+Symbol::set_output_segment(Output_segment* os, Segment_offset_base base)
+{
+  gold_assert(this->is_predefined_);
+  this->source_ = IN_OUTPUT_SEGMENT;
+  this->u_.in_output_segment.output_segment = os;
+  this->u_.in_output_segment.offset_base = base;
+}
+
+// Set the symbol to undefined.  This is used for pre-defined
+// symbols whose segments aren't known until after layout is done
+// (e.g., __ehdr_start).
+
+void
+Symbol::set_undefined()
+{
+  gold_assert(this->is_predefined_);
+  this->source_ = IS_UNDEFINED;
+  this->is_predefined_ = false;
+}
+
 // Class Symbol_table.
 
 Symbol_table::Symbol_table(unsigned int count,
@@ -577,14 +602,7 @@ Symbol_table::gc_mark_undef_symbols(Layout* layout)
       if (sym->source() == Symbol::FROM_OBJECT 
           && !sym->object()->is_dynamic())
         {
-          Relobj* obj = static_cast<Relobj*>(sym->object());
-          bool is_ordinary;
-          unsigned int shndx = sym->shndx(&is_ordinary);
-          if (is_ordinary)
-            {
-              gold_assert(this->gc_ != NULL);
-              this->gc_->worklist().push(Section_id(obj, shndx));
-            }
+	  this->gc_mark_symbol(sym);
         }
     }
 
@@ -595,18 +613,13 @@ Symbol_table::gc_mark_undef_symbols(Layout* layout)
     {
       const char* name = p->c_str();
       Symbol* sym = this->lookup(name);
-      gold_assert(sym != NULL);
-      if (sym->source() == Symbol::FROM_OBJECT 
+      // It's not an error if a symbol named by --export-dynamic-symbol
+      // is undefined.
+      if (sym != NULL
+	  && sym->source() == Symbol::FROM_OBJECT 
           && !sym->object()->is_dynamic())
         {
-          Relobj* obj = static_cast<Relobj*>(sym->object());
-          bool is_ordinary;
-          unsigned int shndx = sym->shndx(&is_ordinary);
-          if (is_ordinary)
-            {
-              gold_assert(this->gc_ != NULL);
-              this->gc_->worklist().push(Section_id(obj, shndx));
-            }
+	  this->gc_mark_symbol(sym);
         }
     }
 
@@ -620,14 +633,7 @@ Symbol_table::gc_mark_undef_symbols(Layout* layout)
       if (sym->source() == Symbol::FROM_OBJECT
 	  && !sym->object()->is_dynamic())
 	{
-	  Relobj* obj = static_cast<Relobj*>(sym->object());
-	  bool is_ordinary;
-	  unsigned int shndx = sym->shndx(&is_ordinary);
-	  if (is_ordinary)
-	    {
-	      gold_assert(this->gc_ != NULL);
-	      this->gc_->worklist().push(Section_id(obj, shndx));
-	    }
+	  this->gc_mark_symbol(sym);
 	}
     }
 }
@@ -636,14 +642,14 @@ void
 Symbol_table::gc_mark_symbol(Symbol* sym)
 {
   // Add the object and section to the work list.
-  Relobj* obj = static_cast<Relobj*>(sym->object());
   bool is_ordinary;
   unsigned int shndx = sym->shndx(&is_ordinary);
   if (is_ordinary && shndx != elfcpp::SHN_UNDEF)
     {
       gold_assert(this->gc_!= NULL);
-      this->gc_->worklist().push(Section_id(obj, shndx));
+      this->gc_->worklist().push(Section_id(sym->object(), shndx));
     }
+  parameters->target().gc_mark_symbol(this, sym);
 }
 
 // When doing garbage collection, keep symbols that have been seen in
@@ -1277,7 +1283,8 @@ Symbol_table::add_from_relobj(
 	  && res->is_externally_visible()
 	  && !res->is_from_dynobj()
           && (parameters->options().shared()
-	      || parameters->options().export_dynamic()))
+	      || parameters->options().export_dynamic()
+	      || parameters->options().in_dynamic_list(res->name())))
         this->gc_mark_symbol(res);
 
       if (is_defined_in_discarded_section)
@@ -2387,6 +2394,27 @@ Symbol_table::set_dynsym_indexes(unsigned int index,
 				 Stringpool* dynpool,
 				 Versions* versions)
 {
+  std::vector<Symbol*> as_needed_sym;
+
+  // Allow a target to set dynsym indexes.
+  if (parameters->target().has_custom_set_dynsym_indexes())
+    {
+      std::vector<Symbol*> dyn_symbols;
+      for (Symbol_table_type::iterator p = this->table_.begin();
+           p != this->table_.end();
+           ++p)
+        {
+          Symbol* sym = p->second;
+          if (!sym->should_add_dynsym_entry(this))
+            sym->set_dynsym_index(-1U);
+          else
+            dyn_symbols.push_back(sym);
+        }
+
+      return parameters->target().set_dynsym_indexes(&dyn_symbols, index, syms,
+                                                     dynpool, versions, this);
+    }
+
   for (Symbol_table_type::iterator p = this->table_.begin();
        p != this->table_.end();
        ++p)
@@ -2406,16 +2434,41 @@ Symbol_table::set_dynsym_indexes(unsigned int index,
 	  syms->push_back(sym);
 	  dynpool->add(sym->name(), false, NULL);
 
-	  // Record any version information.
-          if (sym->version() != NULL)
-            versions->record_version(this, dynpool, sym);
-
 	  // If the symbol is defined in a dynamic object and is
-	  // referenced in a regular object, then mark the dynamic
-	  // object as needed.  This is used to implement --as-needed.
-	  if (sym->is_from_dynobj() && sym->in_reg())
+	  // referenced strongly in a regular object, then mark the
+	  // dynamic object as needed.  This is used to implement
+	  // --as-needed.
+	  if (sym->is_from_dynobj()
+	      && sym->in_reg()
+	      && !sym->is_undef_binding_weak())
 	    sym->object()->set_is_needed();
+
+	  // Record any version information, except those from
+	  // as-needed libraries not seen to be needed.  Note that the
+	  // is_needed state for such libraries can change in this loop.
+	  if (sym->version() != NULL)
+	    {
+	      if (!sym->is_from_dynobj()
+		  || !sym->object()->as_needed()
+		  || sym->object()->is_needed())
+		versions->record_version(this, dynpool, sym);
+	      else
+		as_needed_sym.push_back(sym);
+	    }
 	}
+    }
+
+  // Process version information for symbols from as-needed libraries.
+  for (std::vector<Symbol*>::iterator p = as_needed_sym.begin();
+       p != as_needed_sym.end();
+       ++p)
+    {
+      Symbol* sym = *p;
+
+      if (sym->object()->is_needed())
+	versions->record_version(this, dynpool, sym);
+      else
+	sym->clear_version();
     }
 
   // Finish up the versions.  In some cases this may add new dynamic
@@ -2932,15 +2985,24 @@ Symbol_table::sized_write_globals(const Stringpool* sympool,
 	  break;
 
 	case Symbol::IN_OUTPUT_DATA:
-	  shndx = sym->output_data()->out_shndx();
-	  if (shndx >= elfcpp::SHN_LORESERVE)
-	    {
-	      if (sym_index != -1U)
-		symtab_xindex->add(sym_index, shndx);
-	      if (dynsym_index != -1U)
-		dynsym_xindex->add(dynsym_index, shndx);
-	      shndx = elfcpp::SHN_XINDEX;
-	    }
+	  {
+	    Output_data* od = sym->output_data();
+
+	    shndx = od->out_shndx();
+	    if (shndx >= elfcpp::SHN_LORESERVE)
+	      {
+		if (sym_index != -1U)
+		  symtab_xindex->add(sym_index, shndx);
+		if (dynsym_index != -1U)
+		  dynsym_xindex->add(dynsym_index, shndx);
+		shndx = elfcpp::SHN_XINDEX;
+	      }
+
+	    // In object files symbol values are section
+	    // relative.
+	    if (parameters->options().relocatable())
+	      sym_value -= od->address();
+	  }
 	  break;
 
 	case Symbol::IN_OUTPUT_SEGMENT:
@@ -2975,6 +3037,8 @@ Symbol_table::sized_write_globals(const Stringpool* sympool,
 	  unsigned char* pd = dynamic_view + (dynsym_index * sym_size);
 	  this->sized_write_symbol<size, big_endian>(sym, dynsym_value, shndx,
 						     binding, dynpool, pd);
+          // Allow a target to adjust dynamic symbol value.
+          parameters->target().adjust_dyn_symbol(sym, pd);
 	}
     }
 
@@ -3194,9 +3258,11 @@ Symbol_table::linenos_from_loc(const Task* task,
   Task_lock_obj<Object> tl(task, loc.object);
 
   std::vector<std::string> result;
+  Symbol_location code_loc = loc;
+  parameters->target().function_location(&code_loc);
   // 16 is the size of the object-cache that one_addr2line should use.
   std::string canonical_result = Dwarf_line_info::one_addr2line(
-      loc.object, loc.shndx, loc.offset, 16, &result);
+      code_loc.object, code_loc.shndx, code_loc.offset, 16, &result);
   if (!canonical_result.empty())
     result.push_back(canonical_result);
   return result;
@@ -3601,6 +3667,32 @@ Symbol_table::define_with_copy_reloc<64>(
     Sized_symbol<64>* sym,
     Output_data* posd,
     elfcpp::Elf_types<64>::Elf_Addr value);
+#endif
+
+#if defined(HAVE_TARGET_32_LITTLE) || defined(HAVE_TARGET_32_BIG)
+template
+void
+Sized_symbol<32>::init_output_data(const char* name, const char* version,
+				   Output_data* od, Value_type value,
+				   Size_type symsize, elfcpp::STT type,
+				   elfcpp::STB binding,
+				   elfcpp::STV visibility,
+				   unsigned char nonvis,
+				   bool offset_is_from_end,
+				   bool is_predefined);
+#endif
+
+#if defined(HAVE_TARGET_64_LITTLE) || defined(HAVE_TARGET_64_BIG)
+template
+void
+Sized_symbol<64>::init_output_data(const char* name, const char* version,
+				   Output_data* od, Value_type value,
+				   Size_type symsize, elfcpp::STT type,
+				   elfcpp::STB binding,
+				   elfcpp::STV visibility,
+				   unsigned char nonvis,
+				   bool offset_is_from_end,
+				   bool is_predefined);
 #endif
 
 #ifdef HAVE_TARGET_32_LITTLE

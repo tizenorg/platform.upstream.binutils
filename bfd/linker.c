@@ -1,7 +1,5 @@
 /* linker.c -- BFD linker routines
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -315,7 +313,7 @@ SUBSUBSECTION
 
 	The <<input_bfds>> field of the <<bfd_link_info>> structure
 	will point to a list of all the input files included in the
-	link.  These files are linked through the <<link_next>> field
+	link.  These files are linked through the <<link.next>> field
 	of the <<bfd>> structure.
 
 	Each section in the output file will have a list of
@@ -484,11 +482,22 @@ _bfd_link_hash_table_init
 				      const char *),
    unsigned int entsize)
 {
+  bfd_boolean ret;
+
+  BFD_ASSERT (!abfd->is_linker_output && !abfd->link.hash);
   table->undefs = NULL;
   table->undefs_tail = NULL;
   table->type = bfd_link_generic_hash_table;
 
-  return bfd_hash_table_init (&table->table, newfunc, entsize);
+  ret = bfd_hash_table_init (&table->table, newfunc, entsize);
+  if (ret)
+    {
+      /* Arrange for destruction of this hash table on closing ABFD.  */
+      table->hash_table_free = _bfd_generic_link_hash_table_free;
+      abfd->link.hash = table;
+      abfd->is_linker_output = TRUE;
+    }
+  return ret;
 }
 
 /* Look up a symbol in a link hash table.  If follow is TRUE, we
@@ -568,8 +577,6 @@ bfd_wrapped_link_hash_lookup (bfd *abfd,
 	  return h;
 	}
 
-#undef WRAP
-
 #undef  REAL
 #define REAL "__real_"
 
@@ -603,6 +610,42 @@ bfd_wrapped_link_hash_lookup (bfd *abfd,
 
   return bfd_link_hash_lookup (info->hash, string, create, copy, follow);
 }
+
+/* If H is a wrapped symbol, ie. the symbol name starts with "__wrap_"
+   and the remainder is found in wrap_hash, return the real symbol.  */
+
+struct bfd_link_hash_entry *
+unwrap_hash_lookup (struct bfd_link_info *info,
+		    bfd *input_bfd,
+		    struct bfd_link_hash_entry *h)
+{
+  const char *l = h->root.string;
+
+  if (*l == bfd_get_symbol_leading_char (input_bfd)
+      || *l == info->wrap_char)
+    ++l;
+
+  if (CONST_STRNEQ (l, WRAP))
+    {
+      l += sizeof WRAP - 1;
+
+      if (bfd_hash_lookup (info->wrap_hash, l, FALSE, FALSE) != NULL)
+	{
+	  char save = 0;
+	  if (l - (sizeof WRAP - 1) != h->root.string)
+	    {
+	      --l;
+	      save = *l;
+	      *(char *) l = *h->root.string;
+	    }
+	  h = bfd_link_hash_lookup (info->hash, l, FALSE, FALSE, FALSE);
+	  if (save)
+	    *(char *) l = save;
+	}
+    }
+  return h;
+}
+#undef WRAP
 
 /* Traverse a generic link hash table.  Differs from bfd_hash_traverse
    in the treatment of warning symbols.  When warning symbols are
@@ -739,13 +782,16 @@ _bfd_generic_link_hash_table_create (bfd *abfd)
 }
 
 void
-_bfd_generic_link_hash_table_free (struct bfd_link_hash_table *hash)
+_bfd_generic_link_hash_table_free (bfd *obfd)
 {
-  struct generic_link_hash_table *ret
-    = (struct generic_link_hash_table *) hash;
+  struct generic_link_hash_table *ret;
 
+  BFD_ASSERT (obfd->is_linker_output && obfd->link.hash);
+  ret = (struct generic_link_hash_table *) obfd->link.hash;
   bfd_hash_table_free (&ret->root.table);
   free (ret);
+  obfd->link.hash = NULL;
+  obfd->is_linker_output = FALSE;
 }
 
 /* Grab the symbols for an object file when doing a generic link.  We
@@ -2014,7 +2060,7 @@ _bfd_generic_final_link (bfd *abfd, struct bfd_link_info *info)
 	p->u.indirect.section->linker_mark = TRUE;
 
   /* Build the output symbol table.  */
-  for (sub = info->input_bfds; sub != NULL; sub = sub->link_next)
+  for (sub = info->input_bfds; sub != NULL; sub = sub->link.next)
     if (! _bfd_generic_link_output_symbols (abfd, sub, info, &outsymalloc))
       return FALSE;
 
@@ -2359,6 +2405,12 @@ _bfd_generic_link_output_symbols (bfd *output_bfd,
 	  else
 	    output = FALSE;
 	}
+      else if (sym->flags == 0
+	       && (sym->section->owner->flags & BFD_PLUGIN) != 0)
+	/* LTO doesn't set symbol information.  We get here with the
+	   generic linker for a symbol that was "common" but no longer
+	   needs to be global.  */
+	output = FALSE;
       else
 	abort ();
 
@@ -2913,7 +2965,7 @@ DESCRIPTION
 /* Sections marked with the SEC_LINK_ONCE flag should only be linked
    once into the output.  This routine checks each section, and
    arrange to discard it if a section of the same name has already
-   been linked.  This code assumes that all relevant sections have the 
+   been linked.  This code assumes that all relevant sections have the
    SEC_LINK_ONCE flag set; that is, it does not depend solely upon the
    section name.  bfd_section_already_linked is called via
    bfd_map_over_sections.  */
@@ -3296,7 +3348,7 @@ bfd_generic_define_common_symbol (bfd *output_bfd,
 
 /*
 FUNCTION
-	bfd_find_version_for_sym 
+	bfd_find_version_for_sym
 
 SYNOPSIS
 	struct bfd_elf_version_tree * bfd_find_version_for_sym

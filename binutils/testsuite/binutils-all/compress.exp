@@ -1,23 +1,22 @@
-#   Copyright 2010
-#   Free Software Foundation, Inc.
+#   Copyright (C) 2010-2014 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
 
 # Test compressed .debug section.
 
-if { [is_remote host] || ![is_elf_format] } then {
+if { [is_remote host] || ![is_elf_format] || ![is_zlib_supported] } then {
     return
 }
 
@@ -134,6 +133,18 @@ if ![string match "" $got] then {
     }
 }
 
+set testname "objdump compress debug sections"
+set got [remote_exec host "$OBJDUMP -W $compressedfile" "" "/dev/null" "objdump.out"]
+if { [lindex $got 0] != 0 || ![string match "" [lindex $got 1]] } then {
+    fail "$testname"
+    send_log "$got\n"
+}
+if { [regexp_diff objdump.out $srcdir/$subdir/dw2-1.W] } then {
+    fail "$testname"
+} else {
+    pass "$testname"
+}
+
 set testfile tmpdir/dw2-emty.o
 
 if { ![binutils_assemble_flags $srcdir/$subdir/dw2-empty.S $testfile --nocompress-debug-sections] } then {
@@ -162,3 +173,13 @@ if ![string match "" $got] then {
 	fail "objcopy ($testname)"
     }
 }
+
+if ![is_remote host] {
+    set tempfile tmpdir/debug_str.o
+    set copyfile tmpdir/debug_str.copy
+} else {
+    set tempfile [remote_download host tmpdir/debug_str.o]
+    set copyfile debug_str.copy
+}
+
+run_dump_test "debug_str"

@@ -1,7 +1,5 @@
 # This shell script emits a C file. -*- C -*-
-#   Copyright 1991, 1993, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-#   2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-#   Free Software Foundation, Inc.
+#   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 #
 # This file is part of the GNU Binutils.
 #
@@ -30,10 +28,10 @@ fragment <<EOF
 #include "ldctor.h"
 #include "elf/arm.h"
 
-static char *thumb_entry_symbol = NULL;
+static char * thumb_entry_symbol = NULL;
 static int byteswap_code = 0;
 static int target1_is_rel = 0${TARGET1_IS_REL};
-static char *target2_type = "${TARGET2_TYPE}";
+static char * target2_type = "${TARGET2_TYPE}";
 static int fix_v4bx = 0;
 static int use_blx = 0;
 static bfd_arm_vfp11_fix vfp11_denorm_fix = BFD_ARM_VFP11_FIX_DEFAULT;
@@ -52,6 +50,7 @@ gld${EMULATION_NAME}_before_parse (void)
 #endif /* not TARGET_ */
   input_flags.dynamic = ${DYNAMIC_LINK-TRUE};
   config.has_shared = `if test -n "$GENERATE_SHLIB_SCRIPT" ; then echo TRUE ; else echo FALSE ; fi`;
+  config.separate_code = `if test "x${SEPARATE_CODE}" = xyes ; then echo TRUE ; else echo FALSE ; fi`;
 }
 
 static void
@@ -183,13 +182,13 @@ hook_in_stub (struct hook_stub_info *info, lang_statement_union_type **lp)
    immediately after INPUT_SECTION.  */
 
 static asection *
-elf32_arm_add_stub_section (const char *stub_sec_name,
-			    asection *input_section)
+elf32_arm_add_stub_section (const char * stub_sec_name,
+			    asection *   input_section,
+			    unsigned int alignment_power)
 {
   asection *stub_sec;
   flagword flags;
   asection *output_section;
-  const char *secname;
   lang_output_section_statement_type *os;
   struct hook_stub_info info;
 
@@ -200,11 +199,10 @@ elf32_arm_add_stub_section (const char *stub_sec_name,
   if (stub_sec == NULL)
     goto err_ret;
 
-  bfd_set_section_alignment (stub_file->the_bfd, stub_sec, 3);
+  bfd_set_section_alignment (stub_file->the_bfd, stub_sec, alignment_power);
 
   output_section = input_section->output_section;
-  secname = bfd_get_section_name (output_section->owner, output_section);
-  os = lang_output_section_find (secname);
+  os = lang_output_section_get (output_section);
 
   info.input_section = input_section;
   lang_list_init (&info.add);
@@ -254,19 +252,19 @@ compare_output_sec_vma (const void *a, const void *b)
   asection *asec = *(asection **) a, *bsec = *(asection **) b;
   asection *aout = asec->output_section, *bout = bsec->output_section;
   bfd_vma avma, bvma;
-  
+
   /* If there's no output section for some reason, compare equal.  */
   if (!aout || !bout)
     return 0;
-  
+
   avma = aout->vma + asec->output_offset;
   bvma = bout->vma + bsec->output_offset;
-  
+
   if (avma > bvma)
     return 1;
   else if (avma < bvma)
     return -1;
-  
+
   return 0;
 }
 
@@ -286,10 +284,10 @@ gld${EMULATION_NAME}_after_allocation (void)
 	{
 	  bfd *abfd = is->the_bfd;
 	  asection *sec;
-	  
+
 	  if ((abfd->flags & (EXEC_P | DYNAMIC)) != 0)
 	    continue;
-	  
+
 	  for (sec = abfd->sections; sec != NULL; sec = sec->next)
 	    {
 	      asection *out_sec = sec->output_section;
@@ -305,7 +303,7 @@ gld${EMULATION_NAME}_after_allocation (void)
 		  if (sec_count == list_size)
 		    {
 		      list_size *= 2;
-		      sec_list = (asection **) 
+		      sec_list = (asection **)
                           xrealloc (sec_list, list_size * sizeof (asection *));
 		    }
 
@@ -313,13 +311,13 @@ gld${EMULATION_NAME}_after_allocation (void)
 		}
 	    }
 	}
-	
+
       qsort (sec_list, sec_count, sizeof (asection *), &compare_output_sec_vma);
-      
+
       if (elf32_arm_fix_exidx_coverage (sec_list, sec_count, &link_info,
 					   merge_exidx_entries))
 	need_laying_out = 1;
-      
+
       free (sec_list);
     }
 
@@ -465,7 +463,7 @@ arm_elf_create_output_section_statements (void)
 				   target2_type, fix_v4bx, use_blx,
 				   vfp11_denorm_fix, no_enum_size_warning,
 				   no_wchar_size_warning,
-				   pic_veneer, fix_cortex_a8, 
+				   pic_veneer, fix_cortex_a8,
 				   fix_arm1176);
 
   stub_file = lang_add_input_file ("linker stubs",
@@ -480,7 +478,7 @@ arm_elf_create_output_section_statements (void)
       einfo ("%X%P: can not create BFD %E\n");
       return;
     }
- 
+
   stub_file->the_bfd->flags |= BFD_LINKER_CREATED;
   ldlang_add_file (stub_file);
 
@@ -533,6 +531,7 @@ PARSE_AND_LIST_PROLOGUE='
 #define OPTION_NO_MERGE_EXIDX_ENTRIES   316
 #define OPTION_FIX_ARM1176		317
 #define OPTION_NO_FIX_ARM1176		318
+#define OPTION_LONG_PLT		        319
 '
 
 PARSE_AND_LIST_SHORTOPTS=p
@@ -557,6 +556,7 @@ PARSE_AND_LIST_LONGOPTS='
   { "no-merge-exidx-entries", no_argument, NULL, OPTION_NO_MERGE_EXIDX_ENTRIES },
   { "fix-arm1176", no_argument, NULL, OPTION_FIX_ARM1176 },
   { "no-fix-arm1176", no_argument, NULL, OPTION_NO_FIX_ARM1176 },
+  { "long-plt", no_argument, NULL, OPTION_LONG_PLT },
 '
 
 PARSE_AND_LIST_OPTIONS='
@@ -574,6 +574,8 @@ PARSE_AND_LIST_OPTIONS='
   fprintf (file, _("  --no-wchar-size-warning     Don'\''t warn about objects with incompatible\n"
 		   "                                wchar_t sizes\n"));
   fprintf (file, _("  --pic-veneer                Always generate PIC interworking veneers\n"));
+  fprintf (file, _("  --long-plt                  Generate long .plt entries\n"
+           "                              to handle large .plt/.got displacements\n"));
   fprintf (file, _("\
   --stub-group-size=N         Maximum size of a group of input sections that\n\
                                can be handled by one stub section.  A negative\n\
@@ -676,6 +678,10 @@ PARSE_AND_LIST_ARGS_CASES='
 
    case OPTION_NO_FIX_ARM1176:
       fix_arm1176 = 0;
+      break;
+
+   case OPTION_LONG_PLT:
+      bfd_elf32_arm_use_long_plt ();
       break;
 '
 

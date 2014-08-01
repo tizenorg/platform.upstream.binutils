@@ -1,7 +1,5 @@
 /* BFD back-end for ieee-695 objects.
-   Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 1990-2014 Free Software Foundation, Inc.
 
    Written by Steve Chamberlain of Cygnus Support.
 
@@ -35,6 +33,7 @@
 #include "ieee.h"
 #include "libieee.h"
 #include "safe-ctype.h"
+#include "libiberty.h"
 
 struct output_buffer_struct
 {
@@ -1662,7 +1661,7 @@ ieee_slurp_section_data (bfd *abfd)
   unsigned int section_number;
   ieee_per_section_type *current_map = NULL;
   asection *s;
-  
+
   /* Seek to the start of the data area.  */
   if (ieee->read_data)
     return TRUE;
@@ -1824,7 +1823,7 @@ ieee_object_p (bfd *abfd)
     goto got_wrong_format;
   ieee->mb.module_name = read_id (&(ieee->h));
   if (abfd->filename == (const char *) NULL)
-    abfd->filename = ieee->mb.module_name;
+    abfd->filename = xstrdup (ieee->mb.module_name);
 
   /* Determine the architecture and machine type of the object file.  */
   {
@@ -3780,7 +3779,6 @@ ieee_sizeof_headers (bfd *abfd ATTRIBUTE_UNUSED,
   _bfd_generic_section_already_linked
 #define ieee_bfd_define_common_symbol bfd_generic_define_common_symbol
 #define ieee_bfd_link_hash_table_create _bfd_generic_link_hash_table_create
-#define ieee_bfd_link_hash_table_free _bfd_generic_link_hash_table_free
 #define ieee_bfd_link_add_symbols _bfd_generic_link_add_symbols
 #define ieee_bfd_link_just_syms _bfd_generic_link_just_syms
 #define ieee_bfd_copy_link_hash_symbol_type \
@@ -3858,7 +3856,6 @@ const bfd_target ieee_vec =
 
   /* ieee_sizeof_headers, ieee_bfd_get_relocated_section_contents,
      ieee_bfd_relax_section, ieee_bfd_link_hash_table_create,
-     _bfd_generic_link_hash_table_free,
      ieee_bfd_link_add_symbols, ieee_bfd_final_link,
      ieee_bfd_link_split_section, ieee_bfd_gc_sections,
      ieee_bfd_merge_sections.  */

@@ -1,7 +1,5 @@
 /* strings -- print the strings of printable characters in files
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-   2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,6 +35,10 @@
    -t {o,x,d}	Print the offset within the file before each string,
 		in octal/hex/decimal.
 
+  --include-all-whitespace
+  -w		By default tab and space are the only whitepace included in graphic
+		char sequences.  This option considers all of isspace() valid.
+
    -o		Like -to.  (Some other implementations have -o like -to,
 		others like -td.  We chose one arbitrarily.)
 
@@ -70,7 +72,9 @@
 #define STRING_ISGRAPHIC(c) \
       (   (c) >= 0 \
        && (c) <= 255 \
-       && ((c) == '\t' || ISPRINT (c) || (encoding == 'S' && (c) > 127)))
+       && ((c) == '\t' || ISPRINT (c) || (encoding == 'S' && (c) > 127) \
+           || (include_all_whitespace == TRUE && ISSPACE (c))) \
+      )
 
 #ifndef errno
 extern int errno;
@@ -84,6 +88,9 @@ static int address_radix;
 
 /* Minimum length of sequence of graphic chars to trigger output.  */
 static int string_min;
+
+/* Whether or not we include all whitespace as a graphic char.   */
+static bfd_boolean include_all_whitespace;
 
 /* TRUE means print address within file for each string.  */
 static bfd_boolean print_addresses;
@@ -110,6 +117,7 @@ static struct option long_options[] =
   {"print-file-name", no_argument, NULL, 'f'},
   {"bytes", required_argument, NULL, 'n'},
   {"radix", required_argument, NULL, 't'},
+  {"include-all-whitespace", required_argument, NULL, 'w'},
   {"encoding", required_argument, NULL, 'e'},
   {"target", required_argument, NULL, 'T'},
   {"help", no_argument, NULL, 'h'},
@@ -156,13 +164,14 @@ main (int argc, char **argv)
   expandargv (&argc, &argv);
 
   string_min = 4;
+  include_all_whitespace = FALSE;
   print_addresses = FALSE;
   print_filenames = FALSE;
   datasection_only = TRUE;
   target = NULL;
   encoding = 's';
 
-  while ((optc = getopt_long (argc, argv, "afhHn:ot:e:T:Vv0123456789",
+  while ((optc = getopt_long (argc, argv, "afhHn:wot:e:T:Vv0123456789",
 			      long_options, (int *) 0)) != EOF)
     {
       switch (optc)
@@ -183,6 +192,10 @@ main (int argc, char **argv)
 	  string_min = (int) strtoul (optarg, &s, 0);
 	  if (s != NULL && *s != 0)
 	    fatal (_("invalid integer argument %s"), optarg);
+	  break;
+
+	case 'w':
+	  include_all_whitespace = TRUE;
 	  break;
 
 	case 'o':
@@ -455,8 +468,7 @@ static long
 get_char (FILE *stream, file_ptr *address, int *magiccount, char **magic)
 {
   int c, i;
-  long r = EOF;
-  unsigned char buf[4];
+  long r = 0;
 
   for (i = 0; i < encoding_bytes; i++)
     {
@@ -484,33 +496,21 @@ get_char (FILE *stream, file_ptr *address, int *magiccount, char **magic)
 	}
 
       (*address)++;
-      buf[i] = c;
+      r = (r << 8) | (c & 0xff);
     }
 
   switch (encoding)
     {
-    case 'S':
-    case 's':
-      r = buf[0];
-      break;
-    case 'b':
-      r = (buf[0] << 8) | buf[1];
+    default:
       break;
     case 'l':
-      r = buf[0] | (buf[1] << 8);
-      break;
-    case 'B':
-      r = ((long) buf[0] << 24) | ((long) buf[1] << 16) |
-	((long) buf[2] << 8) | buf[3];
+      r = ((r & 0xff) << 8) | ((r & 0xff00) >> 8);
       break;
     case 'L':
-      r = buf[0] | ((long) buf[1] << 8) | ((long) buf[2] << 16) |
-	((long) buf[3] << 24);
+      r = (((r & 0xff) << 24) | ((r & 0xff00) << 8)
+	   | ((r & 0xff0000) >> 8) | ((r & 0xff000000) >> 24));
       break;
     }
-
-  if (r == EOF)
-    return 0;
 
   return r;
 }
@@ -654,6 +654,7 @@ usage (FILE *stream, int status)
   -n --bytes=[number]       Locate & print any NUL-terminated sequence of at\n\
   -<number>                   least [number] characters (default 4).\n\
   -t --radix={o,d,x}        Print the location of the string in base 8, 10 or 16\n\
+  -w --include-all-whitespace Include all whitespace as valid string characters\n\
   -o                        An alias for --radix=o\n\
   -T --target=<BFDNAME>     Specify the binary file format\n\
   -e --encoding={s,S,b,l,B,L} Select character size and endianness:\n\

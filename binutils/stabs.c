@@ -1,6 +1,5 @@
 /* stabs.c -- Parse stabs debugging information
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011  Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    Written by Ian Lance Taylor <ian@cygnus.com>.
 
    This file is part of GNU Binutils.
@@ -2758,9 +2757,8 @@ parse_stab_members (void *dhandle, struct stab_handle *info,
              argtypes string is the mangled form of the argument
              types, and the full type and the physical name must be
              extracted from them.  */
-	  if (! stub)
-	    physname = argtypes;
-	  else
+	  physname = argtypes;
+	  if (stub)
 	    {
 	      debug_type class_type, return_type;
 
@@ -2879,9 +2877,7 @@ parse_stab_argtypes (void *dhandle, struct stab_handle *info,
 		   || CONST_STRNEQ (argtypes, "__dt"));
   is_v3 = argtypes[0] == '_' && argtypes[1] == 'Z';
 
-  if (is_destructor || is_full_physname_constructor || is_v3)
-    *pphysname = argtypes;
-  else
+  if (!(is_destructor || is_full_physname_constructor || is_v3))
     {
       unsigned int len;
       const char *const_prefix;

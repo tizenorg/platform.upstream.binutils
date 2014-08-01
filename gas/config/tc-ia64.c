@@ -1,6 +1,5 @@
 /* tc-ia64.c -- Assembler for the HP/Intel IA-64 architecture.
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2011, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>
 
    This file is part of GAS, the GNU Assembler.
@@ -2978,7 +2977,7 @@ ia64_estimate_size_before_relax (fragS *frag,
 }
 
 /* This function converts a rs_machine_dependent variant frag into a
-  normal fill frag with the unwind image from the the record list.  */
+  normal fill frag with the unwind image from the record list.  */
 void
 ia64_convert_frag (fragS *frag)
 {
@@ -4467,14 +4466,15 @@ dot_endp (int dummy ATTRIBUTE_UNUSED)
 					  symbol_get_frag (unwind.proc_pending.sym));
       else
 	e.X_add_symbol = unwind.proc_pending.sym;
-      ia64_cons_fix_new (frag_now, where, bytes_per_address, &e);
+      ia64_cons_fix_new (frag_now, where, bytes_per_address, &e,
+			 BFD_RELOC_NONE);
 
       e.X_op = O_pseudo_fixup;
       e.X_op_symbol = pseudo_func[FUNC_SEG_RELATIVE].u.sym;
       e.X_add_number = 0;
       e.X_add_symbol = proc_end;
       ia64_cons_fix_new (frag_now, where + bytes_per_address,
-			 bytes_per_address, &e);
+			 bytes_per_address, &e, BFD_RELOC_NONE);
 
       if (unwind.info)
 	{
@@ -4483,7 +4483,7 @@ dot_endp (int dummy ATTRIBUTE_UNUSED)
 	  e.X_add_number = 0;
 	  e.X_add_symbol = unwind.info;
 	  ia64_cons_fix_new (frag_now, where + (bytes_per_address * 2),
-			     bytes_per_address, &e);
+			     bytes_per_address, &e, BFD_RELOC_NONE);
 	}
     }
   subseg_set (saved_seg, saved_subseg);
@@ -6934,15 +6934,6 @@ emit_one_bundle (void)
 	  md.slot[curr].unwind_record = NULL;
 	}
 
-      if (required_unit == IA64_UNIT_L)
-	{
-	  know (i == 1);
-	  /* skip one slot for long/X-unit instructions */
-	  ++i;
-	}
-      --md.num_slots_in_use;
-      last_slot = i;
-
       for (j = 0; j < md.slot[curr].num_fixups; ++j)
 	{
 	  ifix = md.slot[curr].fixup + j;
@@ -6954,6 +6945,17 @@ emit_one_bundle (void)
 	}
 
       end_of_insn_group = md.slot[curr].end_of_insn_group;
+
+      /* This adjustment to "i" must occur after the fix, otherwise the fix
+	 is assigned to the wrong slot, and the VMS linker complains.  */
+      if (required_unit == IA64_UNIT_L)
+	{
+	  know (i == 1);
+	  /* skip one slot for long/X-unit instructions */
+	  ++i;
+	}
+      --md.num_slots_in_use;
+      last_slot = i;
 
       /* clear slot:  */
       ia64_free_opcode (md.slot[curr].idesc);
@@ -11055,9 +11057,9 @@ ia64_dwarf2_emit_offset (symbolS *symbol, unsigned int size)
    fixup.  We pick the right reloc code depending on the byteorder
    currently in effect.  */
 void
-ia64_cons_fix_new (fragS *f, int where, int nbytes, expressionS *exp)
+ia64_cons_fix_new (fragS *f, int where, int nbytes, expressionS *exp,
+		   bfd_reloc_code_real_type code)
 {
-  bfd_reloc_code_real_type code;
   fixS *fix;
 
   switch (nbytes)

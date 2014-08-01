@@ -1,6 +1,5 @@
 /* resrc.c -- read and write Windows rc files.
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2008, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support.
    Rewritten by Kai Tietz, Onevision.
 
@@ -323,7 +322,7 @@ open_input_stream (char *cmd)
       if (run_cmd (cmd, cpp_temp_file))
 	fatal (_("can't execute `%s': %s"), cmd, strerror (errno));
 
-      cpp_pipe = fopen (cpp_temp_file, FOPEN_RT);;
+      cpp_pipe = fopen (cpp_temp_file, FOPEN_RT);
       if (cpp_pipe == NULL)
 	fatal (_("can't open temporary file `%s': %s"),
 	       cpp_temp_file, strerror (errno));

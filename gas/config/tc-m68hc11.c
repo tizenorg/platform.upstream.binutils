@@ -1,7 +1,5 @@
 /* tc-m68hc11.c -- Assembler code for the Motorola 68HC11 & 68HC12.
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010,
-   2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1999-2014 Free Software Foundation, Inc.
    Written by Stephane Carrez (stcarrez@nerim.fr)
    XGATE and S12X added by James Murray (jsm@jsm-net.demon.co.uk)
 
@@ -1603,11 +1601,8 @@ fixup8 (expressionS *oper, int mode, int opmode)
 
       if (mode == M6811_OP_JUMP_REL)
 	{
-	  fixS *fixp;
-
-	  fixp = fix_new_exp (frag_now, f - frag_now->fr_literal, 1,
-			      oper, TRUE, BFD_RELOC_8_PCREL);
-	  fixp->fx_pcrel_adjust = 1;
+	  fix_new_exp (frag_now, f - frag_now->fr_literal, 1,
+		       oper, TRUE, BFD_RELOC_8_PCREL);
 	}
       else
 	{
@@ -1676,8 +1671,7 @@ fixup16 (expressionS *oper, int mode, int opmode ATTRIBUTE_UNUSED)
 			  reloc == BFD_RELOC_16_PCREL,
                           reloc);
       number_to_chars_bigendian (f, 0, 2);
-      if (reloc == BFD_RELOC_16_PCREL)
-	fixp->fx_pcrel_adjust = 2;
+
       if (reloc == BFD_RELOC_M68HC11_LO16)
         fixp->fx_no_overflow = 1;
     }
@@ -1756,23 +1750,17 @@ fixup8_xg (expressionS *oper, int mode, int opmode)
     {
       if (mode == M68XG_OP_REL9)
         {
-          fixS *fixp;
-
           /* Future improvement:
 	     This fixup/reloc isn't adding on constants to symbols.  */
-          fixp = fix_new_exp (frag_now, f - frag_now->fr_literal -1, 2,
-			      oper, TRUE, BFD_RELOC_M68HC12_9_PCREL);
-          fixp->fx_pcrel_adjust = 1;
+          fix_new_exp (frag_now, f - frag_now->fr_literal -1, 2,
+		       oper, TRUE, BFD_RELOC_M68HC12_9_PCREL);
       	}
       else if (mode == M68XG_OP_REL10)
         {
-          fixS *fixp;
-
           /* Future improvement:
 	     This fixup/reloc isn't adding on constants to symbols.  */
-          fixp = fix_new_exp (frag_now, f - frag_now->fr_literal -1, 2,
-    	      oper, TRUE, BFD_RELOC_M68HC12_10_PCREL);
-          fixp->fx_pcrel_adjust = 1;
+          fix_new_exp (frag_now, f - frag_now->fr_literal -1, 2,
+    	               oper, TRUE, BFD_RELOC_M68HC12_10_PCREL);
         }
       else
         {
@@ -3965,7 +3953,6 @@ void
 md_convert_frag (bfd *abfd ATTRIBUTE_UNUSED, asection *sec ATTRIBUTE_UNUSED,
                  fragS *fragP)
 {
-  fixS *fixp;
   long value;
   long disp;
   char *buffer_address = fragP->fr_literal;
@@ -4018,10 +4005,9 @@ md_convert_frag (bfd *abfd ATTRIBUTE_UNUSED, asection *sec ATTRIBUTE_UNUSED,
       fragP->fr_opcode[1] = fragP->fr_opcode[0];
       fragP->fr_opcode[0] = M6811_OPCODE_PAGE2;
 
-      fixp = fix_new (fragP, fragP->fr_fix, 2,
-		      fragP->fr_symbol, fragP->fr_offset, 1,
+      fix_new (fragP, fragP->fr_fix, 2,
+	       fragP->fr_symbol, fragP->fr_offset, 1,
 		      BFD_RELOC_16_PCREL);
-      fixp->fx_pcrel_adjust = 2;
       fragP->fr_fix += 2;
       break;
 
@@ -4060,9 +4046,9 @@ md_convert_frag (bfd *abfd ATTRIBUTE_UNUSED, asection *sec ATTRIBUTE_UNUSED,
           && fragP->fr_symbol != 0
           && S_GET_SEGMENT (fragP->fr_symbol) != absolute_section)
 	{
-	  fixp = fix_new (fragP, fragP->fr_fix, 2,
-			  fragP->fr_symbol, fragP->fr_offset,
-			  1, BFD_RELOC_16_PCREL);
+	  fix_new (fragP, fragP->fr_fix, 2,
+	           fragP->fr_symbol, fragP->fr_offset,
+		   1, BFD_RELOC_16_PCREL);
 	}
       else
 	{

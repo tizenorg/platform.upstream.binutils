@@ -13,8 +13,11 @@ GENERATE_SHLIB_SCRIPT=yes
 GENERATE_PIE_SCRIPT=yes
 NO_SMALL_DATA=yes
 LARGE_SECTIONS=yes
+LARGE_BSS_AFTER_BSS=
 SEPARATE_GOTPLT="SIZEOF (.got.plt) >= 24 ? 24 : 0"
 IREL_IN_PLT=
+# Reuse TINY_READONLY_SECTION which is placed right after .plt section.
+TINY_READONLY_SECTION=".plt.bnd      ${RELOCATING-0} : { *(.plt.bnd) }"
 
 if [ "x${host}" = "x${target}" ]; then
   case " $EMULATION_LIBPATH " in
@@ -31,7 +34,7 @@ case "$target" in
       *64*) LIBPATH_SUFFIX=64 ;;
     esac
     ;;
-  *-*-solaris2*) 
+  *-*-solaris2*)
     LIBPATH_SUFFIX=/amd64
     ELF_INTERPRETER_NAME=\"/lib/amd64/ld.so.1\"
   ;;

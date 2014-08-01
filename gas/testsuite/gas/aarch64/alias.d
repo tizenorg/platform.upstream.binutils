@@ -72,3 +72,37 @@ Disassembly of section \.text:
  100:	b13ffdff 	cmn	x15, #0xfff
  104:	f13fffef 	subs	x15, sp, #0xfff
  108:	b13ffdff 	cmn	x15, #0xfff
+ 10c:	0f08a448 	sxtl	v8.8h, v2.8b
+ 110:	0f08a448 	sxtl	v8.8h, v2.8b
+ 114:	4f08a448 	sxtl2	v8.8h, v2.16b
+ 118:	4f08a448 	sxtl2	v8.8h, v2.16b
+ 11c:	0f10a448 	sxtl	v8.4s, v2.4h
+ 120:	0f10a448 	sxtl	v8.4s, v2.4h
+ 124:	4f10a448 	sxtl2	v8.4s, v2.8h
+ 128:	4f10a448 	sxtl2	v8.4s, v2.8h
+ 12c:	0f20a448 	sxtl	v8.2d, v2.2s
+ 130:	0f20a448 	sxtl	v8.2d, v2.2s
+ 134:	4f20a448 	sxtl2	v8.2d, v2.4s
+ 138:	4f20a448 	sxtl2	v8.2d, v2.4s
+ 13c:	2f08a448 	uxtl	v8.8h, v2.8b
+ 140:	2f08a448 	uxtl	v8.8h, v2.8b
+ 144:	6f08a448 	uxtl2	v8.8h, v2.16b
+ 148:	6f08a448 	uxtl2	v8.8h, v2.16b
+ 14c:	2f10a448 	uxtl	v8.4s, v2.4h
+ 150:	2f10a448 	uxtl	v8.4s, v2.4h
+ 154:	6f10a448 	uxtl2	v8.4s, v2.8h
+ 158:	6f10a448 	uxtl2	v8.4s, v2.8h
+ 15c:	2f20a448 	uxtl	v8.2d, v2.2s
+ 160:	2f20a448 	uxtl	v8.2d, v2.2s
+ 164:	6f20a448 	uxtl2	v8.2d, v2.4s
+ 168:	6f20a448 	uxtl2	v8.2d, v2.4s
+ 16c:	1a81f420 	csinc	w0, w1, w1, nv
+ 170:	1a81e420 	csinc	w0, w1, w1, al
+ 174:	1a9ff7e0 	csinc	w0, wzr, wzr, nv
+ 178:	1a9fe7e0 	csinc	w0, wzr, wzr, al
+ 17c:	5a81f020 	csinv	w0, w1, w1, nv
+ 180:	5a81e020 	csinv	w0, w1, w1, al
+ 184:	5a9ff3e0 	csinv	w0, wzr, wzr, nv
+ 188:	5a9fe3e0 	csinv	w0, wzr, wzr, al
+ 18c:	5a81f420 	csneg	w0, w1, w1, nv
+ 190:	5a81e420 	csneg	w0, w1, w1, al

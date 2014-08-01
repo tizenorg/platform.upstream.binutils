@@ -1,7 +1,5 @@
 /* Linker file opening and searching.
-   Copyright 1991, 1992, 1993, 1994, 1995, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2007, 2008, 2009, 2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU Binutils.
 
@@ -369,7 +367,7 @@ ldfile_open_file_search (const char *arch,
 	    return TRUE;
 	}
 
-      if (entry->flags.maybe_archive)
+      if (entry->flags.maybe_archive && !entry->flags.full_name_provided)
 	string = concat (search->name, slash, lib, entry->filename,
 			 arch, suffix, (const char *) NULL);
       else
@@ -602,6 +600,7 @@ ldfile_open_command_file_1 (const char *name, bfd_boolean default_only)
     {
       bfd_set_error (bfd_error_system_call);
       einfo (_("%P%F: cannot open linker script file %s: %E\n"), name);
+      return;
     }
 
   lex_push_file (ldlex_input_stack, name, sysrooted);

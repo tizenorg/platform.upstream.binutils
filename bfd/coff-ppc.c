@@ -1,7 +1,5 @@
 /* BFD back-end for PowerPC Microsoft Portable Executable files.
-   Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012  Free Software Foundation, Inc.
+   Copyright (C) 1990-2014 Free Software Foundation, Inc.
 
    Original version pieced together by Kim Knuttila (krk@cygnus.com)
 
@@ -301,13 +299,13 @@ ppc_coff_link_hash_table_create (bfd *abfd)
 
 static bfd_reloc_status_type ppc_refhi_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
-static bfd_reloc_status_type ppc_pair_reloc 
+static bfd_reloc_status_type ppc_pair_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
 static bfd_reloc_status_type ppc_toc16_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
 static bfd_reloc_status_type ppc_section_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
-static bfd_reloc_status_type ppc_secrel_reloc 
+static bfd_reloc_status_type ppc_secrel_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
 static bfd_reloc_status_type ppc_imglue_reloc
   (bfd *, arelent *, asymbol *, void *, asection *, bfd *, char **);
@@ -316,7 +314,7 @@ static bfd_reloc_status_type ppc_imglue_reloc
    get us started, so those I'll make sure work. Those marked FIXME are either
    completely unverified or have a specific unknown marked in the comment.  */
 
-/* Relocation entries for Windows/NT on PowerPC.                             
+/* Relocation entries for Windows/NT on PowerPC.
 
    From the document "" we find the following listed as used relocs:
 
@@ -1200,7 +1198,7 @@ coff_ppc_relocate_section (bfd *output_bfd,
 	  {
 	    /* To solve this, we need to know whether or not the symbol
 	       appearing on the call instruction is a glue function or not.
-	       A glue function must announce itself via a IMGLUE reloc, and 
+	       A glue function must announce itself via a IMGLUE reloc, and
 	       the reloc contains the required toc restore instruction.  */
 	    DUMP_RELOC2 (howto->name, rel);
 
@@ -2151,7 +2149,7 @@ ppc_bfd_coff_final_link (bfd *abfd, struct bfd_link_info *info)
      the opportunity to clear the output_has_begun fields of all the
      input BFD's.  */
   max_sym_count = 0;
-  for (sub = info->input_bfds; sub != NULL; sub = sub->link_next)
+  for (sub = info->input_bfds; sub != NULL; sub = sub->link.next)
     {
       bfd_size_type sz;
 
@@ -2480,10 +2478,11 @@ const bfd_target TARGET_LITTLE_SYM =
    HAS_SYMS | HAS_LOCALS | WP_TEXT | D_PAGED),
 
 #ifndef COFF_WITH_PE
-  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_RELOC), /* section flags */
+  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_CODE | SEC_READONLY
+   | SEC_RELOC),		/* section flags */
 #else
-  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_RELOC /* section flags */
-   | SEC_LINK_ONCE | SEC_LINK_DUPLICATES),
+  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_CODE | SEC_READONLY
+   | SEC_RELOC | SEC_LINK_ONCE | SEC_LINK_DUPLICATES),
 #endif
 
   0,				/* leading char */
@@ -2540,10 +2539,11 @@ const bfd_target TARGET_BIG_SYM =
    HAS_SYMS | HAS_LOCALS | WP_TEXT | D_PAGED),
 
 #ifndef COFF_WITH_PE
-  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_RELOC), /* section flags */
+  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_CODE | SEC_READONLY
+   | SEC_RELOC),		/* section flags */
 #else
-  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_RELOC /* section flags */
-   | SEC_LINK_ONCE | SEC_LINK_DUPLICATES),
+  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_CODE | SEC_READONLY
+   | SEC_RELOC | SEC_LINK_ONCE | SEC_LINK_DUPLICATES),
 #endif
 
   0,				/* leading char */

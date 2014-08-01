@@ -1,7 +1,5 @@
 /* tc-m68k.c -- Assemble for the m68k family
-   Copyright 1987, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
-   Free Software Foundation, Inc.
+   Copyright (C) 1987-2014 Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler.
 
@@ -1377,9 +1375,7 @@ tc_gen_reloc (asection *section ATTRIBUTE_UNUSED, fixS *fixp)
     reloc->addend = fixp->fx_addnumber;
   else
     reloc->addend = (section->vma
-		     /* Explicit sign extension in case char is
-			unsigned.  */
-		     + ((fixp->fx_pcrel_adjust & 0xff) ^ 0x80) - 0x80
+		     + fixp->fx_pcrel_adjust
 		     + fixp->fx_addnumber
 		     + md_pcrel_from (fixp));
 #endif
@@ -7911,9 +7907,7 @@ md_pcrel_from (fixS *fixP)
 {
   int adjust;
 
-  /* Because fx_pcrel_adjust is a char, and may be unsigned, we explicitly
-     sign extend the value here.  */
-  adjust = ((fixP->fx_pcrel_adjust & 0xff) ^ 0x80) - 0x80;
+  adjust = fixP->fx_pcrel_adjust;
   if (adjust == 64)
     adjust = -1;
   return fixP->fx_where + fixP->fx_frag->fr_address - adjust;
@@ -8137,3 +8131,17 @@ tc_m68k_frame_initial_instructions (void)
   cfi_add_CFA_def_cfa (sp_regno, -DWARF2_CIE_DATA_ALIGNMENT);
   cfi_add_CFA_offset (DWARF2_DEFAULT_RETURN_COLUMN, DWARF2_CIE_DATA_ALIGNMENT);
 }
+
+/* Check and emit error if broken-word handling has failed to fix up a
+   case-table.	This is called from write.c, after doing everything it
+   knows about how to handle broken words.  */
+
+void
+tc_m68k_check_adjusted_broken_word (offsetT new_offset, struct broken_word *brokwP)
+{
+  if (new_offset > 32767 || new_offset < -32768)
+    as_bad_where (brokwP->frag->fr_file, brokwP->frag->fr_line,
+		  _("Adjusted signed .word (%#lx) overflows: `switch'-statement too large."),
+		  (long) new_offset);
+}
+

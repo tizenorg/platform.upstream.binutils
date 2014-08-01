@@ -48,14 +48,14 @@ from @file{sunos.c}:
 
 @example
        #define TARGET_NAME "a.out-sunos-big"
-       #define VECNAME    sunos_big_vec
+       #define VECNAME    sparc_aout_sunos_be_vec
        #include "aoutf1.h"
 @end example
 
 requires all the names from @file{aout32.c}, and produces the jump vector
 
 @example
-       sunos_big_vec
+       sparc_aout_sunos_be_vec
 @end example
 
 The file @file{host-aout.c} is a special case.  It is for a large set

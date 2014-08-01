@@ -1,7 +1,5 @@
 /* ECOFF debugging support.
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
    This file was put together by Ian Lance Taylor <ian@cygnus.com>.  A
    good deal of it comes directly from mips-tfile.c, by Michael
@@ -27,8 +25,7 @@
 #include "as.h"
 
 /* This file is compiled conditionally for those targets which use
-   ECOFF debugging information (e.g., MIPS ECOFF, MIPS ELF, Alpha
-   ECOFF).  */
+   ECOFF debugging information (e.g., MIPS ELF, Alpha ECOFF).  */
 
 #include "ecoff.h"
 
@@ -2535,7 +2532,7 @@ ecoff_directive_def (int ignore ATTRIBUTE_UNUSED)
 	free (coff_sym_name);
       if (coff_tag != (char *) NULL)
 	free (coff_tag);
-      
+
       coff_sym_name = xstrdup (name);
       coff_type = type_info_init;
       coff_storage_class = sc_Nil;

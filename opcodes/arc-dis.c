@@ -1,6 +1,5 @@
 /* Instruction printing code for the ARC.
-   Copyright 1994, 1995, 1997, 1998, 2000, 2001, 2002, 2005, 2007, 2009,
-   2010, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1994-2014 Free Software Foundation, Inc.
    Contributed by Doug Evans (dje@cygnus.com).
 
    This file is part of libopcodes.
@@ -426,8 +425,7 @@ write_comments_(struct arcDisState * state,
 	    strcpy (state->commentBuffer, comment_prefix);
 	  else
 	    strcat (state->commentBuffer, ", ");
-	  strncat (state->commentBuffer, state->comm[i],
-		   sizeof (state->commentBuffer));
+	  strcat (state->commentBuffer, state->comm[i]);
 	}
     }
 }
