@@ -130,8 +130,9 @@ AArch64_reloc_property_table::AArch64_reloc_property_table()
 std::string
 AArch64_reloc_property_table::reloc_name_in_error_message(unsigned int code)
 {
-  int tidx = code_to_array_index(code);
-  const AArch64_reloc_property* arp = this->table_[tidx];
+  gold_assert(code < Property_table_size);
+
+  const AArch64_reloc_property* arp = this->table_[code];
 
   if (arp == NULL)
     {
