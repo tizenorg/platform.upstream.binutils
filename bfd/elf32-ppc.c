@@ -5512,9 +5512,12 @@ ppc_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
 	{
 	  /* Taking a function's address in a read/write section
 	     doesn't require us to define the function symbol in the
-	     executable on a global entry stub.  A dynamic reloc can
+	     executable on a plt call stub.  A dynamic reloc can
 	     be used instead.  */
 	  if (h->pointer_equality_needed
+	      && h->type != STT_GNU_IFUNC
+	      && !htab->is_vxworks
+	      && !ppc_elf_hash_entry (h)->has_sda_refs
 	      && !readonly_dynrelocs (h))
 	    {
 	      h->pointer_equality_needed = 0;
@@ -7162,7 +7165,7 @@ ppc_elf_relax_section (bfd *abfd,
       bfd_vma pagesize = (bfd_vma) 1 << htab->params->pagesize_p2;
 
       addr = isec->output_section->vma + isec->output_offset;
-      end_addr = addr + trampoff - 1;
+      end_addr = addr + trampoff;
       addr &= -pagesize;
       crossings = ((end_addr & -pagesize) - addr) >> htab->params->pagesize_p2;
       if (crossings != 0)

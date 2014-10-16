@@ -46,7 +46,7 @@ enum
 {
   // Null relocation codes
   R_AARCH64_NONE = 0,		// None
-  withdrawn = 256,		// Treat as R_AARCH64_NONE
+  R_AARCH64_withdrawn = 256,	// Treat as R_AARCH64_NONE
 
   // Static relocations
   R_AARCH64_ABS64 = 257,	// S + A
@@ -171,8 +171,12 @@ enum
   R_AARCH64_GLOB_DAT = 1025,		// S + A
   R_AARCH64_JUMP_SLOT = 1026,		// S + A
   R_AARCH64_RELATIVE = 1027,		// Delta(S) + A
-  R_AARCH64_TLS_DTPREL64 = 1028,	// DTPREL(S+A)
-  R_AARCH64_TLS_DTPMOD64 = 1029,	// LDM(S)
+  // Note (shenhan): the following 2 relocs are different from elf spec from
+  // arm.  In elf docs, TLS_DTPMOD64 is defined as 1029, TLS_DTPREL64 1028.
+  // While actually the bfd linker (and the dynamic linker) treates TLS_DTPMOD64
+  // as 1028, TLS_DTPREL64 1029.  See binutils-gdb/include/elf/aarch64.h.
+  R_AARCH64_TLS_DTPMOD64 = 1028,	// LDM(S)
+  R_AARCH64_TLS_DTPREL64 = 1029,	// DTPREL(S+A)
   R_AARCH64_TLS_TPREL64 = 1030,		// TPREL(S+A)
   R_AARCH64_TLSDESC = 1031,		// TLSDESC(S+A)
   R_AARCH64_IRELATIVE = 1032,		// Indirect(Delta(S) + A)

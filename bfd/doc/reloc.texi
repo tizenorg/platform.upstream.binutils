@@ -884,6 +884,12 @@ Relocation against a MIPS literal section.
 @deffnx {} BFD_RELOC_MICROMIPS_16_PCREL_S1
 microMIPS PC-relative relocations.
 @end deffn
+@deffn {} BFD_RELOC_MIPS_21_PCREL_S2
+@deffnx {} BFD_RELOC_MIPS_26_PCREL_S2
+@deffnx {} BFD_RELOC_MIPS_18_PCREL_S3
+@deffnx {} BFD_RELOC_MIPS_19_PCREL_S2
+MIPS PC-relative relocations.
+@end deffn
 @deffn {} BFD_RELOC_MICROMIPS_GPREL16
 @deffnx {} BFD_RELOC_MICROMIPS_HI16
 @deffnx {} BFD_RELOC_MICROMIPS_HI16_S
@@ -1883,6 +1889,13 @@ for PIC
 @deffnx {} BFD_RELOC_NDS32_15_FIXED
 @deffnx {} BFD_RELOC_NDS32_17_FIXED
 @deffnx {} BFD_RELOC_NDS32_25_FIXED
+@deffnx {} BFD_RELOC_NDS32_LONGCALL4
+@deffnx {} BFD_RELOC_NDS32_LONGCALL5
+@deffnx {} BFD_RELOC_NDS32_LONGCALL6
+@deffnx {} BFD_RELOC_NDS32_LONGJUMP4
+@deffnx {} BFD_RELOC_NDS32_LONGJUMP5
+@deffnx {} BFD_RELOC_NDS32_LONGJUMP6
+@deffnx {} BFD_RELOC_NDS32_LONGJUMP7
 for relax
 @end deffn
 @deffn {} BFD_RELOC_NDS32_PLTREL_HI20
@@ -1943,12 +1956,32 @@ If fp were omitted, fp can used as another gp.
 @deffnx {} BFD_RELOC_NDS32_DIFF16
 @deffnx {} BFD_RELOC_NDS32_DIFF32
 @deffnx {} BFD_RELOC_NDS32_DIFF_ULEB128
-@deffnx {} BFD_RELOC_NDS32_25_ABS
-@deffnx {} BFD_RELOC_NDS32_DATA
+@deffnx {} BFD_RELOC_NDS32_EMPTY
+relaxation relative relocation types
+@end deffn
+@deffn {} BFD_RELOC_NDS32_25_ABS
+This is a 25 bit absolute address.
+@end deffn
+@deffn {} BFD_RELOC_NDS32_DATA
 @deffnx {} BFD_RELOC_NDS32_TRAN
 @deffnx {} BFD_RELOC_NDS32_17IFC_PCREL
 @deffnx {} BFD_RELOC_NDS32_10IFCU_PCREL
-relaxation relative relocation types
+For ex9 and ifc using.
+@end deffn
+@deffn {} BFD_RELOC_NDS32_TPOFF
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_HI20
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_LO12
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_ADD
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_LS
+@deffnx {} BFD_RELOC_NDS32_GOTTPOFF
+@deffnx {} BFD_RELOC_NDS32_TLS_IE_HI20
+@deffnx {} BFD_RELOC_NDS32_TLS_IE_LO12S2
+@deffnx {} BFD_RELOC_NDS32_TLS_TPOFF
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_20
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_15S0
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_15S1
+@deffnx {} BFD_RELOC_NDS32_TLS_LE_15S2
+For TLS.
 @end deffn
 @deffn {} BFD_RELOC_V850_9_PCREL
 This is a 9-bit reloc
@@ -2419,6 +2452,14 @@ value.
 @deffn {} BFD_RELOC_AVR_LDS_STS_16
 This is a 7 bit reloc for the AVR that stores SRAM address for 16bit
 lds and sts instructions supported only tiny core.
+@end deffn
+@deffn {} BFD_RELOC_AVR_PORT6
+This is a 6 bit reloc for the AVR that stores an I/O register
+number for the IN and OUT instructions
+@end deffn
+@deffn {} BFD_RELOC_AVR_PORT5
+This is a 5 bit reloc for the AVR that stores an I/O register
+number for the SBIC, SBIS, SBI and CBI instructions
 @end deffn
 @deffn {} BFD_RELOC_RL78_NEG8
 @deffnx {} BFD_RELOC_RL78_NEG16

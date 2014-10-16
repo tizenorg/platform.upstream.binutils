@@ -137,7 +137,7 @@ static bfd_boolean unattached_reloc
   (struct bfd_link_info *, const char *, bfd *, asection *, bfd_vma);
 static bfd_boolean notice
   (struct bfd_link_info *, struct bfd_link_hash_entry *,
-   bfd *, asection *, bfd_vma, flagword, const char *);
+   struct bfd_link_hash_entry *, bfd *, asection *, bfd_vma, flagword);
 
 static struct bfd_link_callbacks link_callbacks =
 {
@@ -611,8 +611,10 @@ get_emulation (int argc, char **argv)
 		   || strcmp (argv[i], "-mips5") == 0
 		   || strcmp (argv[i], "-mips32") == 0
 		   || strcmp (argv[i], "-mips32r2") == 0
+		   || strcmp (argv[i], "-mips32r6") == 0
 		   || strcmp (argv[i], "-mips64") == 0
-		   || strcmp (argv[i], "-mips64r2") == 0)
+		   || strcmp (argv[i], "-mips64r2") == 0
+		   || strcmp (argv[i], "-mips64r6") == 0)
 	    {
 	      /* FIXME: The arguments -mips1, -mips2, -mips3, etc. are
 		 passed to the linker by some MIPS compilers.  They
@@ -1461,11 +1463,11 @@ unattached_reloc (struct bfd_link_info *info ATTRIBUTE_UNUSED,
 static bfd_boolean
 notice (struct bfd_link_info *info,
 	struct bfd_link_hash_entry *h,
+	struct bfd_link_hash_entry *inh ATTRIBUTE_UNUSED,
 	bfd *abfd,
 	asection *section,
 	bfd_vma value,
-	flagword flags ATTRIBUTE_UNUSED,
-	const char *string ATTRIBUTE_UNUSED)
+	flagword flags ATTRIBUTE_UNUSED)
 {
   const char *name;
 

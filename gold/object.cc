@@ -334,7 +334,9 @@ Relobj::is_section_name_included(const char* name)
       || (is_prefix_of(".sdata", name)
 	  && strstr(name, "personality"))
       || (is_prefix_of(".gnu.linkonce.d", name)
-	  && strstr(name, "personality")))
+	  && strstr(name, "personality"))
+      || (is_prefix_of(".rodata", name)
+	  && strstr(name, "nptl_version")))
     {
       return true;
     }
@@ -754,6 +756,16 @@ Sized_relobj_file<size, big_endian>::do_find_special_sections(
 template<int size, bool big_endian>
 void
 Sized_relobj_file<size, big_endian>::do_read_symbols(Read_symbols_data* sd)
+{
+  this->base_read_symbols(sd);
+}
+
+// Read the sections and symbols from an object file.  This is common
+// code for all target-specific overrides of do_read_symbols().
+
+template<int size, bool big_endian>
+void
+Sized_relobj_file<size, big_endian>::base_read_symbols(Read_symbols_data* sd)
 {
   this->read_section_data(&this->elf_file_, sd);
 
@@ -1848,7 +1860,7 @@ Sized_relobj_file<size, big_endian>::do_layout_deferred_sections(Layout* layout)
 
 	  // Reading the symbols again here may be slow.
 	  Read_symbols_data sd;
-	  this->read_symbols(&sd);
+	  this->base_read_symbols(&sd);
 	  this->layout_eh_frame_section(layout,
 					sd.symbols->data(),
 					sd.symbols_size,
@@ -2347,7 +2359,9 @@ Sized_relobj_file<size, big_endian>::compute_final_local_value_internal(
 	      lv_out->set_merged_symbol_value(msv);
 	    }
 	}
-      else if (lv_in->is_tls_symbol())
+      else if (lv_in->is_tls_symbol()
+               || (lv_in->is_section_symbol()
+                   && (os->flags() & elfcpp::SHF_TLS)))
 	lv_out->set_output_value(os->tls_offset()
 				 + secoffset
 				 + lv_in->input_value());

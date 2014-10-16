@@ -27,7 +27,6 @@
 
 #include "as.h"
 #include "safe-ctype.h"
-#include "obstack.h"
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
@@ -1022,7 +1021,8 @@ operand (expressionS *expressionP, enum expr_mode mode)
 	    /* input_line_pointer -> char after operand.  */
 	    if (c == '-')
 	      {
-		expressionP->X_add_number = - expressionP->X_add_number;
+		expressionP->X_add_number
+		  = - (addressT) expressionP->X_add_number;
 		/* Notice: '-' may overflow: no warning is given.
 		   This is compatible with other people's
 		   assemblers.  Sigh.  */

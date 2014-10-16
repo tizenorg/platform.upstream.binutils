@@ -1970,7 +1970,7 @@ _bfd_sparc_elf_gc_sweep_hook (bfd *abfd, struct bfd_link_info *info,
 	}
 
       r_type = SPARC_ELF_R_TYPE (rel->r_info);
-      r_type = sparc_elf_tls_transition (info, abfd, r_type, h != NULL);
+      r_type = sparc_elf_tls_transition (info, abfd, r_type, h == NULL);
       switch (r_type)
 	{
 	case R_SPARC_TLS_LDM_HI22:
@@ -4908,9 +4908,16 @@ _bfd_sparc_elf_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 
   in_attr = &in_attrs[Tag_GNU_Sparc_HWCAPS];
   out_attr = &out_attrs[Tag_GNU_Sparc_HWCAPS];
-
+  
   out_attr->i |= in_attr->i;
   out_attr->type = 1;
+
+  in_attr = &in_attrs[Tag_GNU_Sparc_HWCAPS2];
+  out_attr = &out_attrs[Tag_GNU_Sparc_HWCAPS2];
+  
+  out_attr->i |= in_attr->i;
+  out_attr->type = 1;
+
 
   /* Merge Tag_compatibility attributes and any common GNU ones.  */
   _bfd_elf_merge_object_attributes (ibfd, obfd);

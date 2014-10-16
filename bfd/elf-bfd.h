@@ -280,7 +280,9 @@ struct eh_cie_fde
 
 	 If REMOVED == 0, this is the CIE that we have chosen to use for
 	 the output FDE.  The CIE's REMOVED field is also 0, but the CIE
-	 might belong to a different .eh_frame input section from the FDE.  */
+	 might belong to a different .eh_frame input section from the FDE.
+
+	 May be NULL to signify that the FDE should be discarded.  */
       struct eh_cie_fde *cie_inf;
       struct eh_cie_fde *next_for_section;
     } fde;
@@ -372,6 +374,7 @@ struct eh_frame_sec_info
 struct eh_frame_array_ent
 {
   bfd_vma initial_loc;
+  bfd_size_type range;
   bfd_vma fde;
 };
 
@@ -383,10 +386,6 @@ struct eh_frame_hdr_info
   asection *hdr_sec;
   unsigned int fde_count, array_count;
   struct eh_frame_array_ent *array;
-  /* TRUE if we should try to merge CIEs between input sections.  */
-  bfd_boolean merge_cies;
-  /* TRUE if all .eh_frames have been parsd.  */
-  bfd_boolean parsed_eh_frames;
   /* TRUE if .eh_frame_hdr should contain the sorted search table.
      We build it if we successfully read all .eh_frame input sections
      and recognize them.  */
@@ -1968,13 +1967,8 @@ extern bfd_boolean _bfd_elf_strtab_emit
 extern void _bfd_elf_strtab_finalize
   (struct elf_strtab_hash *);
 
-extern void _bfd_elf_begin_eh_frame_parsing
-  (struct bfd_link_info *info);
 extern void _bfd_elf_parse_eh_frame
   (bfd *, struct bfd_link_info *, asection *, struct elf_reloc_cookie *);
-extern void _bfd_elf_end_eh_frame_parsing
-  (struct bfd_link_info *info);
-
 extern bfd_boolean _bfd_elf_discard_section_eh_frame
   (bfd *, struct bfd_link_info *, asection *,
    bfd_boolean (*) (bfd_vma, void *), struct elf_reloc_cookie *);
@@ -1997,8 +1991,6 @@ extern long _bfd_elf_link_lookup_local_dynindx
   (struct bfd_link_info *, bfd *, long);
 extern bfd_boolean _bfd_elf_compute_section_file_positions
   (bfd *, struct bfd_link_info *);
-extern void _bfd_elf_assign_file_positions_for_relocs
-  (bfd *);
 extern file_ptr _bfd_elf_assign_file_position_for_section
   (Elf_Internal_Shdr *, file_ptr, bfd_boolean);
 

@@ -247,6 +247,7 @@ ALL_EMULATION_SOURCES = \
 	eelf32microblazeel.c \
 	eelf32microblaze.c \
 	eelf32moxie.c \
+	emoxiebox.c \
 	eelf32mt.c \
 	eelf32or1k.c \
 	eelf32or1k_linux.c \
@@ -1160,6 +1161,9 @@ eelf32mipswindiss.c: $(srcdir)/emulparams/elf32mipswindiss.sh $(ELF_DEPS) \
 eelf32moxie.c: $(srcdir)/emulparams/elf32moxie.sh \
   $(ELF_GEN_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 
+emoxiebox.c: $(srcdir)/emulparams/moxiebox.sh \
+  $(ELF_GEN_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+
 eelf32mt.c: $(srcdir)/emulparams/elf32mt.sh \
   $(ELF_GEN_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 
@@ -2069,11 +2073,10 @@ ld.1: $(srcdir)/ld.texinfo configdoc.texi
 
 MAINTAINERCLEANFILES = configdoc.texi ld.1
 
-# We want to reconfigure if configure.host or configure.tgt changes.  We
-# extract version from bfd/configure.in, so we must depend on that also.
+# We want to reconfigure if configure.host or configure.tgt changes.
+# development.sh is used to determine -Werror default.
 CONFIG_STATUS_DEPENDENCIES = $(srcdir)/configure.host $(srcdir)/configure.tgt \
-	$(srcdir)/../bfd/configure.in \
-	$(srcdir)/../bfd/development.sh
+	$(BFDDIR)/development.sh
 
 MOSTLYCLEANFILES = $(STAGESTUFF) ld1$(EXEEXT) ld2$(EXEEXT) ld3$(EXEEXT) \
 	ldemul-list.h crtbegin.@OBJEXT@ crtend.@OBJEXT@ ld.log ld.sum

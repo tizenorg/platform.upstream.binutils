@@ -1,3 +1,43 @@
+2014-10-03  Jing Yu  <jingyu@google.com>
+
+	* configure.ac: Add aarch64 to list of targets that support gold.
+	* configure: Regenerate.
+
+2014-09-12  Andrew Bennett  <andrew.bennett@imgtec.com>
+
+	* configure.ac: Add mips*-img-elf* target triple.
+	* configure: Regenerate.
+
+2014-09-06  Kuan-Lin Chen  <kuanlinchentw@gmail.com>
+	* configure: Disable gdb for nds32*-*-* until supported.
+	* configure.ac: Disable gdb for nds32*-*-* until supported.
+
+2014-09-05  Joel Brobecker  <brobecker@adacore.com>
+
+	* configure: Regenerate.
+
+2014-08-27  Will Newton  <will.newton@linaro.org>
+
+	* src-release.sh: New file.
+	* src-release: Remove file.
+
+2014-07-27  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	GDB not supported for or1k*-*-rtems*
+	* configure.ac (or1k*-*-rtems*): gdb not supported.  The ordering
+	of the stanzas results in this not being caught by or1k*-*-* later.
+	* configure. Regenerated.
+
+2014-07-25  Samuel Bronson  <naesten@gmail.com>
+
+	* .gitattributes: New file for use with git-merge-changelog.
+
+2014-07-21  Joel Sherrill  <joel.sherrill@oarcorp.com>
+
+	Disable gdb for or1k*-*-* until supported
+	* configure.ac (or1k*-*-*): Disable gdb.
+	* configure: Regenerated.
+
 2014-05-14  Sandra Loosemore  <sandra@codesourcery.com>
 
 	* configure.ac (target_makefile_frag): Set for nios2-*-elf*.

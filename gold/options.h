@@ -972,9 +972,11 @@ class General_options
 	      N_("(ARM only) Ignore for backward compatibility"), NULL);
 
   DEFINE_bool(pie, options::ONE_DASH, '\0', false,
-	      N_("Create a position independent executable"), NULL);
+	      N_("Create a position independent executable"),
+	      N_("Do not create a position independent executable"));
   DEFINE_bool_alias(pic_executable, pie, options::TWO_DASHES, '\0',
-		    N_("Create a position independent executable"), NULL,
+		    N_("Create a position independent executable"),
+		    N_("Do not create a position independent executable"),
 		    false);
 
   DEFINE_bool(pipeline_knowledge, options::ONE_DASH, '\0', false,

@@ -4158,15 +4158,7 @@ elfNN_aarch64_relocate_section (bfd *output_bfd,
 					 rel, 1, relend, howto, 0, contents);
 
       if (info->relocatable)
-	{
-	  /* This is a relocatable link.  We don't have to change
-	     anything, unless the reloc is against a section symbol,
-	     in which case we have to adjust according to where the
-	     section symbol winds up in the output section.  */
-	  if (sym != NULL && ELF_ST_TYPE (sym->st_info) == STT_SECTION)
-	    rel->r_addend += sec->output_offset;
-	  continue;
-	}
+	continue;
 
       if (h != NULL)
 	name = h->root.root.string;
@@ -4774,16 +4766,6 @@ elfNN_aarch64_gc_sweep_hook (bfd *abfd,
 	    }
 	  break;
 
-	case BFD_RELOC_AARCH64_ADR_HI21_NC_PCREL:
-	case BFD_RELOC_AARCH64_ADR_HI21_PCREL:
-	case BFD_RELOC_AARCH64_ADR_LO21_PCREL:
-	  if (h != NULL && info->executable)
-	    {
-	      if (h->plt.refcount > 0)
-		h->plt.refcount -= 1;
-	    }
-	  break;
-
 	case BFD_RELOC_AARCH64_CALL26:
 	case BFD_RELOC_AARCH64_JUMP26:
 	  /* If this is a local symbol then we resolve it
@@ -4795,6 +4777,13 @@ elfNN_aarch64_gc_sweep_hook (bfd *abfd,
 	    h->plt.refcount -= 1;
 	  break;
 
+	case BFD_RELOC_AARCH64_MOVW_G0_NC:
+	case BFD_RELOC_AARCH64_MOVW_G1_NC:
+	case BFD_RELOC_AARCH64_MOVW_G2_NC:
+	case BFD_RELOC_AARCH64_MOVW_G3:
+	case BFD_RELOC_AARCH64_ADR_HI21_NC_PCREL:
+	case BFD_RELOC_AARCH64_ADR_HI21_PCREL:
+	case BFD_RELOC_AARCH64_ADR_LO21_PCREL:
 	case BFD_RELOC_AARCH64_NN:
 	  if (h != NULL && info->executable)
 	    {
@@ -5290,6 +5279,22 @@ elfNN_aarch64_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	      return FALSE;
 	    break;
 	  }
+
+	case BFD_RELOC_AARCH64_MOVW_G0_NC:
+	case BFD_RELOC_AARCH64_MOVW_G1_NC:
+	case BFD_RELOC_AARCH64_MOVW_G2_NC:
+	case BFD_RELOC_AARCH64_MOVW_G3:
+	  if (info->shared)
+	    {
+	      int howto_index = bfd_r_type - BFD_RELOC_AARCH64_RELOC_START;
+	      (*_bfd_error_handler)
+		(_("%B: relocation %s against `%s' can not be used when making "
+		   "a shared object; recompile with -fPIC"),
+		 abfd, elfNN_aarch64_howto_table[howto_index].name,
+		 (h) ? h->root.root.string : "a local symbol");
+	      bfd_set_error (bfd_error_bad_value);
+	      return FALSE;
+	    }
 
 	case BFD_RELOC_AARCH64_ADR_HI21_NC_PCREL:
 	case BFD_RELOC_AARCH64_ADR_HI21_PCREL:
@@ -7288,6 +7293,7 @@ const struct elf_size_info elfNN_aarch64_size_info =
 #define elf_backend_may_use_rel_p      0
 #define elf_backend_may_use_rela_p     1
 #define elf_backend_default_use_rela_p 1
+#define elf_backend_rela_normal        1
 #define elf_backend_got_header_size (GOT_ENTRY_SIZE * 3)
 #define elf_backend_default_execstack  0
 

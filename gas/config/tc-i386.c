@@ -543,6 +543,10 @@ static int add_bnd_prefix = 0;
 /* 1 if pseudo index register, eiz/riz, is allowed .  */
 static int allow_index_reg = 0;
 
+/* 1 if the assembler should ignore LOCK prefix, even if it was
+   specified explicitly.  */
+static int omit_lock_prefix = 0;
+
 static enum check_kind
   {
     check_none = 0,
@@ -615,6 +619,9 @@ static enum
     evexw0 = 0,
     evexw1
   } evexwig;
+
+/* Value to encode in EVEX RC bits, for SAE-only instructions.  */
+static enum rc_type evexrcig = rne;
 
 /* Pre-defined "_GLOBAL_OFFSET_TABLE_".  */
 static symbolS *GOT_symbol;
@@ -916,6 +923,12 @@ static const arch_entry cpu_arch[] =
     CPU_PREFETCHWT1_FLAGS, 0, 0 },
   { STRING_COMMA_LEN (".se1"), PROCESSOR_UNKNOWN,
     CPU_SE1_FLAGS, 0, 0 },
+  { STRING_COMMA_LEN (".avx512dq"), PROCESSOR_UNKNOWN,
+    CPU_AVX512DQ_FLAGS, 0, 0 },
+  { STRING_COMMA_LEN (".avx512bw"), PROCESSOR_UNKNOWN,
+    CPU_AVX512BW_FLAGS, 0, 0 },
+  { STRING_COMMA_LEN (".avx512vl"), PROCESSOR_UNKNOWN,
+    CPU_AVX512VL_FLAGS, 0, 0 },
 };
 
 #ifdef I386COFF
@@ -1933,47 +1946,46 @@ mode_from_disp_size (i386_operand_type t)
 }
 
 static INLINE int
-fits_in_signed_byte (offsetT num)
+fits_in_signed_byte (addressT num)
 {
-  return (num >= -128) && (num <= 127);
+  return num + 0x80 <= 0xff;
 }
 
 static INLINE int
-fits_in_unsigned_byte (offsetT num)
+fits_in_unsigned_byte (addressT num)
 {
-  return (num & 0xff) == num;
+  return num <= 0xff;
 }
 
 static INLINE int
-fits_in_unsigned_word (offsetT num)
+fits_in_unsigned_word (addressT num)
 {
-  return (num & 0xffff) == num;
+  return num <= 0xffff;
 }
 
 static INLINE int
-fits_in_signed_word (offsetT num)
+fits_in_signed_word (addressT num)
 {
-  return (-32768 <= num) && (num <= 32767);
+  return num + 0x8000 <= 0xffff;
 }
 
 static INLINE int
-fits_in_signed_long (offsetT num ATTRIBUTE_UNUSED)
+fits_in_signed_long (addressT num ATTRIBUTE_UNUSED)
 {
 #ifndef BFD64
   return 1;
 #else
-  return (!(((offsetT) -1 << 31) & num)
-	  || (((offsetT) -1 << 31) & num) == ((offsetT) -1 << 31));
+  return num + 0x80000000 <= 0xffffffff;
 #endif
 }				/* fits_in_signed_long() */
 
 static INLINE int
-fits_in_unsigned_long (offsetT num ATTRIBUTE_UNUSED)
+fits_in_unsigned_long (addressT num ATTRIBUTE_UNUSED)
 {
 #ifndef BFD64
   return 1;
 #else
-  return (num & (((offsetT) 2 << 31) - 1)) == num;
+  return num <= 0xffffffff;
 #endif
 }				/* fits_in_unsigned_long() */
 
@@ -3163,14 +3175,8 @@ build_vex_prefix (const insn_template *t)
 
       /* Check the REX.W bit.  */
       w = (i.rex & REX_W) ? 1 : 0;
-      if (i.tm.opcode_modifier.vexw)
-	{
-	  if (w)
-	    abort ();
-
-	  if (i.tm.opcode_modifier.vexw == VEXW1)
-	    w = 1;
-	}
+      if (i.tm.opcode_modifier.vexw == VEXW1)
+	w = 1;
 
       i.vex.bytes[2] = (w << 7
 			| register_specifier << 3
@@ -3341,7 +3347,7 @@ build_evex_prefix (void)
       if (i.rounding->type != saeonly)
 	i.vex.bytes[3] |= 0x10 | (i.rounding->type << 5);
       else
-	i.vex.bytes[3] |= 0x10;
+	i.vex.bytes[3] |= 0x10 | (evexrcig << 5);
     }
 
   if (i.mask && i.mask->mask)
@@ -3626,11 +3632,20 @@ md_assemble (char *line)
       as_warn (_("translating to `%sp'"), i.tm.name);
     }
 
-  if (i.tm.opcode_modifier.vex)
-    build_vex_prefix (t);
+  if (i.tm.opcode_modifier.vex || i.tm.opcode_modifier.evex)
+    {
+      if (flag_code == CODE_16BIT)
+	{
+	  as_bad (_("instruction `%s' isn't supported in 16-bit mode."),
+		  i.tm.name);
+	  return;
+	}
 
-  if (i.tm.opcode_modifier.evex)
-    build_evex_prefix ();
+      if (i.tm.opcode_modifier.vex)
+	build_vex_prefix (t);
+      else
+	build_evex_prefix ();
+    }
 
   /* Handle conversion of 'int $3' --> special int3 insn.  XOP or FMA4
      instructions may define INT_OPCODE as well, so avoid this corner
@@ -4450,6 +4465,10 @@ check_VecOperands (const insn_template *t)
 	broadcasted_opnd_size <<= 4; /* Broadcast 1to16.  */
       else if (i.broadcast->type == BROADCAST_1TO8)
 	broadcasted_opnd_size <<= 3; /* Broadcast 1to8.  */
+      else if (i.broadcast->type == BROADCAST_1TO4)
+	broadcasted_opnd_size <<= 2; /* Broadcast 1to4.  */
+      else if (i.broadcast->type == BROADCAST_1TO2)
+	broadcasted_opnd_size <<= 1; /* Broadcast 1to2.  */
       else
 	goto bad_broadcast;
 
@@ -4701,9 +4720,9 @@ match_template (void)
 	       && !operand_types[0].bitfield.regymm
 	       && !operand_types[0].bitfield.regzmm)
 	      || (!operand_types[t->operands > 1].bitfield.regmmx
-		  && !!operand_types[t->operands > 1].bitfield.regxmm
-		  && !!operand_types[t->operands > 1].bitfield.regymm
-		  && !!operand_types[t->operands > 1].bitfield.regzmm))
+		  && operand_types[t->operands > 1].bitfield.regxmm
+		  && operand_types[t->operands > 1].bitfield.regymm
+		  && operand_types[t->operands > 1].bitfield.regzmm))
 	  && (t->base_opcode != 0x0fc7
 	      || t->extension_opcode != 1 /* cmpxchg8b */))
 	continue;
@@ -4718,7 +4737,7 @@ match_template (void)
 	       && ((!operand_types[0].bitfield.regmmx
 		    && !operand_types[0].bitfield.regxmm)
 		   || (!operand_types[t->operands > 1].bitfield.regmmx
-		       && !!operand_types[t->operands > 1].bitfield.regxmm)))
+		       && operand_types[t->operands > 1].bitfield.regxmm)))
 	continue;
 
       /* Do not verify operands when there are none.  */
@@ -6163,8 +6182,8 @@ build_modrm_byte (void)
 	      op = i.tm.operand_types[vvvv];
 	      op.bitfield.regmem = 0;
 	      if ((dest + 1) >= i.operands
-		  || (op.bitfield.reg32 != 1
-		      && !op.bitfield.reg64 != 1
+		  || (!op.bitfield.reg32
+		      && op.bitfield.reg64
 		      && !operand_type_equal (&op, &regxmm)
 		      && !operand_type_equal (&op, &regymm)
 		      && !operand_type_equal (&op, &regzmm)
@@ -6933,6 +6952,15 @@ output_insn (void)
       unsigned char *q;
       unsigned int j;
       unsigned int prefix;
+
+      /* Some processors fail on LOCK prefix. This options makes
+	 assembler ignore LOCK prefix and serves as a workaround.  */
+      if (omit_lock_prefix)
+	{
+	  if (i.tm.base_opcode == LOCK_PREFIX_OPCODE)
+	    return;
+	  i.prefix[LOCK_PREFIX] = 0;
+	}
 
       /* Since the VEX/EVEX prefix contains the implicit prefix, we
 	 don't need the explicit prefix.  */
@@ -7752,6 +7780,10 @@ check_VecOperations (char *op_string, char *op_end)
 	      op_string += 3;
 	      if (*op_string == '8')
 		bcst_type = BROADCAST_1TO8;
+	      else if (*op_string == '4')
+		bcst_type = BROADCAST_1TO4;
+	      else if (*op_string == '2')
+		bcst_type = BROADCAST_1TO2;
 	      else if (*op_string == '1'
 		       && *(op_string+1) == '6')
 		{
@@ -9428,6 +9460,8 @@ parse_register (char *reg_string, char **end_op)
 	  know (e->X_add_number >= 0
 		&& (valueT) e->X_add_number < i386_regtab_size);
 	  r = i386_regtab + e->X_add_number;
+	  if ((r->reg_flags & RegVRex))
+	    i.need_vrex = 1;
 	  *end_op = input_line_pointer;
 	}
       *input_line_pointer = c;
@@ -9522,6 +9556,8 @@ const char *md_shortopts = "qn";
 #define OPTION_MEVEXLIG (OPTION_MD_BASE + 16)
 #define OPTION_MEVEXWIG (OPTION_MD_BASE + 17)
 #define OPTION_MBIG_OBJ (OPTION_MD_BASE + 18)
+#define OPTION_OMIT_LOCK_PREFIX (OPTION_MD_BASE + 19)
+#define OPTION_MEVEXRCIG (OPTION_MD_BASE + 20)
 
 struct option md_longopts[] =
 {
@@ -9551,6 +9587,8 @@ struct option md_longopts[] =
 # if defined (TE_PE) || defined (TE_PEP)
   {"mbig-obj", no_argument, NULL, OPTION_MBIG_OBJ},
 #endif
+  {"momit-lock-prefix", required_argument, NULL, OPTION_OMIT_LOCK_PREFIX},
+  {"mevexrcig", required_argument, NULL, OPTION_MEVEXRCIG},
   {NULL, no_argument, NULL, 0}
 };
 size_t md_longopts_size = sizeof (md_longopts);
@@ -9823,6 +9861,19 @@ md_parse_option (int c, char *arg)
 	as_fatal (_("invalid -mevexlig= option: `%s'"), arg);
       break;
 
+    case OPTION_MEVEXRCIG:
+      if (strcmp (arg, "rne") == 0)
+	evexrcig = rne;
+      else if (strcmp (arg, "rd") == 0)
+	evexrcig = rd;
+      else if (strcmp (arg, "ru") == 0)
+	evexrcig = ru;
+      else if (strcmp (arg, "rz") == 0)
+	evexrcig = rz;
+      else
+	as_fatal (_("invalid -mevexrcig= option: `%s'"), arg);
+      break;
+
     case OPTION_MEVEXWIG:
       if (strcmp (arg, "0") == 0)
 	evexwig = evexw0;
@@ -9837,6 +9888,15 @@ md_parse_option (int c, char *arg)
       use_big_obj = 1;
       break;
 #endif
+
+    case OPTION_OMIT_LOCK_PREFIX:
+      if (strcasecmp (arg, "yes") == 0)
+        omit_lock_prefix = 1;
+      else if (strcasecmp (arg, "no") == 0)
+        omit_lock_prefix = 0;
+      else
+        as_fatal (_("invalid -momit-lock-prefix= option: `%s'"), arg);
+      break;
 
     default:
       return 0;
@@ -9979,6 +10039,10 @@ md_show_usage (FILE *stream)
   -mevexwig=[0|1]         encode EVEX instructions with specific EVEX.W value\n\
                            for EVEX.W bit ignored instructions\n"));
   fprintf (stream, _("\
+  -mevexrcig=[rne|rd|ru|rz]\n\
+                          encode EVEX instructions with specific EVEX.RC value\n\
+                           for SAE-only ignored instructions\n"));
+  fprintf (stream, _("\
   -mmnemonic=[att|intel]  use AT&T/Intel mnemonic\n"));
   fprintf (stream, _("\
   -msyntax=[att|intel]    use AT&T/Intel syntax\n"));
@@ -9994,6 +10058,9 @@ md_show_usage (FILE *stream)
   fprintf (stream, _("\
   -mbig-obj               generate big object files\n"));
 #endif
+  fprintf (stream, _("\
+  -momit-lock-prefix=[no|yes]\n\
+                          strip all lock prefixes\n"));
 }
 
 #if ((defined (OBJ_MAYBE_COFF) && defined (OBJ_MAYBE_AOUT)) \
