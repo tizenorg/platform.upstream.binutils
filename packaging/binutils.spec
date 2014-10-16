@@ -8,15 +8,13 @@ BuildRequires:  glibc-devel-static
 BuildRequires:  bc
 BuildRequires:  makeinfo
 BuildRequires:  zlib-devel-static
+%if 0%{?run_tests:1}
+#BuildRequires: dejagnu
+#BuildRequires: expect
+%endif
 Requires(pre):  update-alternatives
-Version:        2.24.51
+Version:        2.24.90
 Release:        0
-#
-# RUN_TESTS
-%define run_tests %(test ! -f %_sourcedir/RUN_TESTS ; echo $?)
-# check the vanilla binutils, with no patches applied
-# TEST_VANILLA
-%define test_vanilla %(test ! -f %_sourcedir/TEST_VANILLA ; echo $?)
 #
 # handle test suite failures
 #
@@ -28,7 +26,7 @@ Release:        0
 %define	make_check_handling	true
 %endif
 # let make check fail anyway if RUN_TESTS was requested
-%if %{run_tests}
+%if 0%{?run_tests}
 %define	make_check_handling	false
 %endif
 # handle all binary object formats supported by SuSE (and a few more)
@@ -99,7 +97,7 @@ echo "make check will return with %{make_check_handling} in case of testsuite fa
 cp %{SOURCE1001} .
 
 %if 0%{!?cross:1}
-%ifarch %arm
+%ifarch %arm aarch64
 ulimit -Hs unlimited
 ulimit -s unlimited
 %endif
@@ -153,7 +151,7 @@ EXTRA_TARGETS="$EXTRA_TARGETS,aarch64-tizen-linux"
 mkdir build-dir
 cd build-dir
 
-%ifarch %arm
+%ifarch %arm aarch64
 export CONFIG_SHELL="/bin/bash"
 export SHELL="/bin/bash"
 %endif
