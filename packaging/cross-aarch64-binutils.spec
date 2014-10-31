@@ -1,5 +1,5 @@
-Name:         cross-aarch64-binutils
-ExcludeArch: aarch64
+Name:		cross-aarch64-binutils
+ExclusiveArch: %{ix86} x86_64
 %define cross 1
 %define TARGET aarch64
 BuildRequires:  bison

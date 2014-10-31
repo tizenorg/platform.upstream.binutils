@@ -1,5 +1,5 @@
-Name:         cross-i386-binutils
-ExcludeArch: %ix86
+Name:		cross-i386-binutils
+ExclusiveArch: %{ix86} x86_64
 %define cross 1
 %define TARGET i586
 BuildRequires:  bison
