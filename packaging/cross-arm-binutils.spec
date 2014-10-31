@@ -1,5 +1,5 @@
-Name:         cross-arm-binutils
-ExcludeArch: %arm
+Name:		cross-arm-binutils
+ExclusiveArch: %{ix86} x86_64
 %define cross 1
 %define TARGET arm
 BuildRequires:  bison
