@@ -61,10 +61,8 @@ to compile a program or kernel.
 Summary:        The gold linker
 License:        GPL-3.0+
 Group:          Development/Building
-Requires:       binutils = %{version}-%{release}
-%if 0%{!?cross:1}
+Requires:       %{name} = %{version}-%{release}
 %define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
-%endif
 
 %description gold
 gold is an ELF linker.	It is intended to have complete support for ELF
@@ -210,6 +208,9 @@ TARGET_OS=%{TARGET}-tizen-linux
 %endif
 %endif
 ../configure CFLAGS="${RPM_OPT_FLAGS}" \
+%ifarch %gold_archs
+  --enable-gold \
+%endif
   --prefix=%{_prefix} \
   --with-bugurl=http://bugs.opensuse.org/ \
   --with-pkgversion="GNU Binutils; %{DIST}" \
@@ -352,8 +353,7 @@ fi;
 %{_libdir}/ldscripts
 %{_bindir}/*
 %ifarch %gold_archs
-%exclude %{_bindir}/gold
-%exclude %{_bindir}/ld.gold
+%exclude %{_bindir}/*gold
 %endif
 %doc %{_infodir}/*.gz
 %{_libdir}/lib*-%{version}*.so
@@ -366,8 +366,7 @@ fi;
 %files gold 
 %manifest %{name}.manifest
 %defattr(-,root,root)
-%{_bindir}/gold
-%{_bindir}/ld.gold
+%{_bindir}/*gold
 %endif
 
 %if 0%{!?cross:1}
