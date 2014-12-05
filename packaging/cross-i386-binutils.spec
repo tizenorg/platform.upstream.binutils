@@ -63,10 +63,8 @@ to compile a program or kernel.
 Summary:        The gold linker
 License:        GPL-3.0+
 Group:          Development/Building
-Requires:       binutils = %{version}-%{release}
-%if 0%{!?cross:1}
+Requires:       %{name} = %{version}-%{release}
 %define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
-%endif
 
 %description gold
 gold is an ELF linker.	It is intended to have complete support for ELF
@@ -211,6 +209,10 @@ TARGET_OS=%{TARGET}-tizen-linux
 %endif
 %endif
 ../configure CFLAGS="${RPM_OPT_FLAGS}" \
+  --enable-plugins \
+%ifarch %gold_archs
+  --enable-gold \
+%endif
   --prefix=%{_prefix} \
   --with-bugurl=http://bugs.opensuse.org/ \
   --with-pkgversion="GNU Binutils; %{DIST}" \
@@ -248,10 +250,6 @@ make -k check CFLAGS="$RPM_OPT_FLAGS -Wno-unused -Wno-unprototyped-calls" || :
 cd build-dir
 %if 0%{!?cross:1}
 # installing native binutils
-%ifarch %gold_archs
-make DESTDIR=$RPM_BUILD_ROOT install-gold
-ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
-%endif
 make DESTDIR=$RPM_BUILD_ROOT install-info install
 make -C gas/doc DESTDIR=$RPM_BUILD_ROOT install-info-am install-am
 make DESTDIR=$RPM_BUILD_ROOT install-bfd install-opcodes
@@ -305,6 +303,11 @@ T=$(basename %buildroot/usr/%{TARGET}*)
 for f in %buildroot/usr/$T/bin/* ; do
    ln -sf /usr/bin/$T-$(basename $f) $f
 done
+%ifarch %gold_archs
+make DESTDIR=$RPM_BUILD_ROOT install-gold
+ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
+ln -sf %{_bindir}/ld.gold $RPM_BUILD_ROOT/%{prefix}/%{TARGET}/*gold
+%endif
 %if "%{TARGET}" == "avr"
 install -c gas-nesc/as-new $RPM_BUILD_ROOT%{_prefix}/bin/%{TARGET}-nesc-as
 ln -sf ../../bin/%{TARGET}-nesc-as $RPM_BUILD_ROOT%{_prefix}/%{TARGET}/bin/nesc-as
@@ -352,8 +355,7 @@ fi;
 %{_libdir}/ldscripts
 %{_bindir}/*
 %ifarch %gold_archs
-%exclude %{_bindir}/gold
-%exclude %{_bindir}/ld.gold
+%exclude %{_bindir}/*gold
 %endif
 %doc %{_infodir}/*.gz
 %{_libdir}/lib*-%{version}*.so
@@ -365,8 +367,8 @@ fi;
 %ifarch %gold_archs
 %files gold 
 %defattr(-,root,root)
-%{_bindir}/gold
-%{_bindir}/ld.gold
+%{_bindir}/*gold
+%{_prefix}/%{TARGET}/*gold
 %endif
 
 %if 0%{!?cross:1}
