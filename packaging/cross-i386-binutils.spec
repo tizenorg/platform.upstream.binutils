@@ -9,10 +9,10 @@ BuildRequires:  gcc-c++
 BuildRequires:  glibc-devel-static
 # for some gold tests
 BuildRequires:  bc
-BuildRequires:  makeinfo
+BuildRequires:  makeinfo ncurses-devel
 BuildRequires:  zlib-devel-static
 Requires(pre):  update-alternatives
-Version:        2.24.90
+Version:        2.25
 Release:        0
 #
 # RUN_TESTS
@@ -259,6 +259,9 @@ make DESTDIR=$RPM_BUILD_ROOT install-info install
 make -C gas/doc DESTDIR=$RPM_BUILD_ROOT install-info-am install-am
 make DESTDIR=$RPM_BUILD_ROOT install-bfd install-opcodes
 
+# We have gdb in separate package
+rm -f %buildroot/%_bindir/gdb*
+
 if [ ! -f "%buildroot/%_bindir/ld.bfd" ]; then
   mv "%buildroot/%_bindir"/{ld,ld.bfd};
 else
@@ -285,10 +288,10 @@ install -m 644 libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/libbfd-*
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/libopcodes-*
 # No shared linking outside binutils
-rm $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.so
-rm $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes,inproctrace}.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.la
 # Remove unwanted files to shut up rpm
-rm $RPM_BUILD_ROOT%{_mandir}/man1/dlltool.1 $RPM_BUILD_ROOT%{_mandir}/man1/windres.1 $RPM_BUILD_ROOT%{_mandir}/man1/windmc.1
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/dlltool.1 $RPM_BUILD_ROOT%{_mandir}/man1/windres.1 $RPM_BUILD_ROOT%{_mandir}/man1/windmc.1
 cd ..
 #%find_lang binutils
 #%find_lang bfd binutils.lang
@@ -320,6 +323,11 @@ rm -rf $RPM_BUILD_ROOT%{_infodir}
 rm -rf $RPM_BUILD_ROOT%{_prefix}/lib*
 rm -rf $RPM_BUILD_ROOT%{_prefix}/include
 rm -f $RPM_BUILD_ROOT%{_prefix}/bin/*-c++filt
+
+# We have gdb in separate package
+rm -f $RPM_BUILD_ROOT%{_bindir}/gdb*
+rm -rf $RPM_BUILD_ROOT%{_datadir}/gdb
+
 > ../binutils.lang
 %endif
 cd $RPM_BUILD_DIR/binutils-%version
@@ -386,7 +394,9 @@ fi;
 %files devel
 %defattr(-,root,root)
 %{_prefix}/include/*.h
+%{_prefix}/include/gdb/*.h
 %{_libdir}/lib*.*a
+%{_datadir}/gdb/*
 %endif
 
 %changelog
