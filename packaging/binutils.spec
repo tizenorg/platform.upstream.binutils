@@ -260,6 +260,7 @@ make DESTDIR=$RPM_BUILD_ROOT install-bfd install-opcodes
 
 # We have gdb in separate package
 rm -f %buildroot/%_bindir/gdb*
+rm -f %buildroot/%_bindir/gcore*
 
 if [ ! -f "%buildroot/%_bindir/ld.bfd" ]; then
   mv "%buildroot/%_bindir"/{ld,ld.bfd};
@@ -325,6 +326,7 @@ rm -f $RPM_BUILD_ROOT%{_prefix}/bin/*-c++filt
 
 # We have gdb in separate package
 rm -f $RPM_BUILD_ROOT%{_bindir}/gdb*
+rm -f $RPM_BUILD_ROOT%{_bindir}/gcore*
 rm -rf $RPM_BUILD_ROOT%{_datadir}/gdb
 
 > ../binutils.lang
