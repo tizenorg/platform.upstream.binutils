@@ -175,9 +175,16 @@ Plugin::load()
   this->handle_ = dlopen(this->filename_.c_str(), RTLD_NOW);
   if (this->handle_ == NULL)
     {
+#ifdef IGNORE_MISSING_PLUGINS
+      gold_warning(_("%s: could not load plugin library: %s"),
+                   this->filename_.c_str(), dlerror());
+      this->broken_=true;
+      return;
+#else
       gold_error(_("%s: could not load plugin library: %s"),
                  this->filename_.c_str(), dlerror());
       return;
+#endif
     }
 
   // Find the plugin's onload entry point.
@@ -430,6 +437,17 @@ Plugin_manager::~Plugin_manager()
 }
 
 // Load all plugin libraries.
+#ifdef IGNORE_MISSING_PLUGINS
+bool delete_broken(const Plugin* a){
+  if(a->broken()){
+    // remove broken plugin as it will be deleted from list
+    delete a;
+    return true;
+  } else {
+    return false;
+  }
+}
+#endif
 
 void
 Plugin_manager::load_plugins(Layout* layout)
@@ -439,6 +457,9 @@ Plugin_manager::load_plugins(Layout* layout)
        this->current_ != this->plugins_.end();
        ++this->current_)
     (*this->current_)->load();
+#ifdef IGNORE_MISSING_PLUGINS
+  this->plugins_.remove_if(delete_broken);
+#endif
 }
 
 // Call the plugin claim-file handlers in turn to see if any claim the file.

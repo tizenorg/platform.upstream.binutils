@@ -60,6 +60,9 @@ class Plugin
       claim_file_handler_(NULL),
       all_symbols_read_handler_(NULL),
       cleanup_handler_(NULL),
+#ifdef IGNORE_MISSING_PLUGINS
+      broken_(false),
+#endif
       cleanup_done_(false)
   { }
 
@@ -103,6 +106,11 @@ class Plugin
   {
     this->args_.push_back(arg);
   }
+#ifdef IGNORE_MISSING_PLUGINS
+  bool
+  broken() const
+  { return this->broken_; }
+#endif
 
  private:
   Plugin(const Plugin&);
@@ -118,6 +126,10 @@ class Plugin
   ld_plugin_claim_file_handler claim_file_handler_;
   ld_plugin_all_symbols_read_handler all_symbols_read_handler_;
   ld_plugin_cleanup_handler cleanup_handler_;
+#ifdef IGNORE_MISSING_PLUGINS
+  // TRUE if we cannot open this plugin
+  bool broken_;
+#endif
   // TRUE if the cleanup handlers have been called.
   bool cleanup_done_;
 };
