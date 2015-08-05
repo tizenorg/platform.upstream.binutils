@@ -105,7 +105,6 @@ ulimit -s unlimited
 
 sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/version.h
 %build
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -DBFD_PLUGIN_LTO_NAME=liblto_plugin_%{_arch}.so"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wno-error"
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS |sed -e 's/atom/i686/g'`
 %if 0%{!?cross:1}
