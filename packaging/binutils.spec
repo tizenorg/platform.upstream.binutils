@@ -307,6 +307,8 @@ rm -rf %{buildroot}%{_infodir}
 rm -rf %{buildroot}%{_prefix}/%{_lib}/libiberty.a
 %endif # !%{isnative}
 
+%endif #HSH
+
 # This one comes from gcc
 rm -f %{buildroot}%{_infodir}/dir
 rm -rf %{buildroot}%{_prefix}/%{binutils_target}
@@ -368,6 +370,7 @@ if [ $1 = 0 ] ;then
   %install_info --delete --info-dir=%{_infodir} %{_infodir}/bfd.info
 fi
 %endif # %{isnative}
+
 
 %if %{disable_nls}
 %files
