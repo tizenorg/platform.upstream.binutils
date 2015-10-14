@@ -1,4 +1,7 @@
-Name:           binutils
+Name:		cross-i386-binutils
+ExclusiveArch: %{ix86} x86_64
+%define cross 1
+%define TARGET i586
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc-c++
@@ -49,7 +52,6 @@ Group:          Development/Building
 Source:         binutils-%{version}.tar.bz2
 Source1:        pre_checkin.sh
 Source3:        baselibs.conf
-Source1001: 	binutils.manifest
 
 %description
 C compiler utilities: ar, as, gprof, ld, nm, objcopy, objdump, ranlib,
@@ -94,7 +96,6 @@ binutils.
 %prep
 echo "make check will return with %{make_check_handling} in case of testsuite failures."
 %setup -q -n binutils-%{version}
-cp %{SOURCE1001} .
 
 %if 0%{!?cross:1}
 %ifarch %arm
@@ -359,7 +360,6 @@ fi;
 %endif
 
 %files 
-%manifest %{name}.manifest
 %defattr(-,root,root)
 %if 0%{!?cross:1}
 %{_docdir}/%{name}
@@ -380,7 +380,6 @@ fi;
 
 %ifarch %gold_archs
 %files gold 
-%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_bindir}/*gold
 %if 0%{?cross:1}
@@ -396,7 +395,6 @@ fi;
 
 %if 0%{!?cross:1}
 %files devel
-%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_prefix}/include/*.h
 %{_prefix}/include/gdb/*.h
