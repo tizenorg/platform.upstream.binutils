@@ -219,11 +219,12 @@ rm -f binutils-%{_target_platform}.tar.bz2 binutils-%{_target_platform}-*.{sum,l
 %install
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
-%if %{isnative}
-make prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
 
 #HSH
 %if 0
+%if %{isnative}
+make prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
+
 # Rebuild libiberty.a with -fPIC.
 # Future: Remove it together with its header file, projects should bundle it.
 make -C libiberty clean
