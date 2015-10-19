@@ -62,7 +62,8 @@ Summary:        The gold linker
 License:        GPL-3.0+
 Group:          Development/Building
 Requires:       %{name} = %{version}-%{release}
-%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
+#%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
+%define gold_archs 0
 
 %description gold
 gold is an ELF linker.	It is intended to have complete support for ELF
@@ -192,11 +193,11 @@ echo "HSH start configure"
 
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
-	--enable-plugins
 #	--enable-plugins \
-#%ifarch %gold_archs
-#	--enable-gold \
-#%endif
+%ifarch %gold_archs
+	--enable-gold \
+%endif
+	--enable-plugins
 #	--enable-shared
 make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
@@ -305,7 +306,7 @@ echo "HSH make install end"
 %{_prefix}/bin/*
 
 ### HSH disable make install and file part 
-%if 0
+#%if 0
 
 %install
 cd build-dir
@@ -466,6 +467,6 @@ fi;
 %endif
 
 ### HSH disable make install and file part 
-%endif 
+#%endif 
 
 %changelog
