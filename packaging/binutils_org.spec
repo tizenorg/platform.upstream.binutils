@@ -108,34 +108,6 @@ sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/v
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -DBFD_PLUGIN_LTO_NAME=liblto_plugin_%{_arch}.so"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wno-error"
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS |sed -e 's/atom/i686/g'`
-
-
-### HSH
-%if 0
-echo "HSH confifure"
-
-%define TARGET aarch64-linux
-#%define PREFIX=/home//work/cross-toolchain-spin-aarch64
-#%define TARGET_PREFIX=$PREFIX/$TARGET
-#%define PATH=$PATH:$PREFIX/bin 
-
-mkdir build-dir
-cd build-dir
-
-../configure --target=%{TARGET} --prefix=%{_prefix} \
-    --program-prefix=%{TARGET} \
-    --disable-nls --with-abi=aapcs-linux
-make -j8
-
-echo "HSH confifure end"
-### HSH
-%endif
-
-
-
-#### HSH
-#%if 0
-
 %if 0%{!?cross:1}
 # Building native binutils
 echo "Building native binutils." 
@@ -185,11 +157,6 @@ export CONFIG_SHELL="/bin/bash"
 export SHELL="/bin/bash"
 %endif
 
-
-### HSH echo
-echo "HSH start configure"
-
-
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
 	--enable-plugins \
@@ -201,10 +168,6 @@ make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
 rm bfd/Makefile
 make %{?_smp_mflags}
-
-
-### HSH echo
-echo "HSH end configure"
 
 %else
 # building cross-TARGET-binutils
@@ -274,9 +237,6 @@ make -C gas-nesc %{?_smp_mflags}
 %endif
 %endif
 
-#%endif 
-###HSH
-
 %check
 unset LD_AS_NEEDED
 cd build-dir
@@ -285,24 +245,6 @@ make -k check CFLAGS="-O2 -g" CXXFLAGS="-O2 -g" || %{make_check_handling}
 %else
 make -k check CFLAGS="$RPM_OPT_FLAGS -Wno-unused -Wno-unprototyped-calls" || :
 %endif
-
-
-### HSH
-%install
-echo "HSH make install"
-cd build-dir
-make install
-echo "HSH make install end"
-### HSH end
-
-%files 
-%manifest %{name}.manifest
-%defattr(-,root,root)
-%{_prefix}/%{TARGET}*
-%{_prefix}/bin/*
-
-### HSH disable make install and file part 
-%if 0
 
 %install
 cd build-dir
@@ -461,8 +403,5 @@ fi;
 %{_libdir}/lib*.*a
 %{_datadir}/gdb/*
 %endif
-
-### HSH disable make install and file part 
-%endif 
 
 %changelog
