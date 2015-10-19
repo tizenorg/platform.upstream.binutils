@@ -62,8 +62,8 @@ Summary:        The gold linker
 License:        GPL-3.0+
 Group:          Development/Building
 Requires:       %{name} = %{version}-%{release}
+### HSH
 #%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
-%define gold_archs 0
 
 %description gold
 gold is an ELF linker.	It is intended to have complete support for ELF
@@ -193,11 +193,11 @@ echo "HSH start configure"
 
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
+	--enable-plugins
 #	--enable-plugins \
-%ifarch %gold_archs
+%if 0 ### HSH %ifarch %gold_archs
 	--enable-gold \
 %endif
-	--enable-plugins
 #	--enable-shared
 make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
@@ -249,7 +249,7 @@ TARGET_OS=%{TARGET}-tizen-linux
 %endif
 ../configure CFLAGS="${RPM_OPT_FLAGS}" \
   --enable-plugins \
-%ifarch %gold_archs
+%if 0  ##HSH %ifarch %gold_archs
   --enable-gold \
 %endif
   --prefix=%{_prefix} \
@@ -312,7 +312,7 @@ echo "HSH make install end"
 cd build-dir
 %if 0%{!?cross:1}
 # installing native binutils
-%ifarch %gold_archs
+%if 0 ###HSH %ifarch %gold_archs
 make DESTDIR=$RPM_BUILD_ROOT install-gold
 ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
 %endif
@@ -336,7 +336,7 @@ ln -s "%_sysconfdir/alternatives/ld" "%buildroot/%_bindir/ld";
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 ln -sf ../../bin/{ar,as,ld,nm,ranlib,strip} $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
-%ifarch %gold_archs
+%if 0 ### HSH %ifarch %gold_archs
 ln -sf ../../bin/ld.gold $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 %endif
 
@@ -430,7 +430,7 @@ fi;
 %ghost %_sysconfdir/alternatives/ld
 %{_libdir}/ldscripts
 %{_bindir}/*
-%ifarch %gold_archs
+%if 0 ### HSH %ifarch %gold_archs
 %exclude %{_bindir}/*gold
 %endif
 %doc %{_infodir}/*.gz
@@ -440,7 +440,7 @@ fi;
 %{_prefix}/bin/*
 %endif
 
-%ifarch %gold_archs
+%if 0 ### HSH %ifarch %gold_archs
 %files gold 
 %manifest %{name}.manifest
 %defattr(-,root,root)
