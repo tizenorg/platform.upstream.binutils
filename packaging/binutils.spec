@@ -64,6 +64,7 @@ Group:          Development/Building
 Requires:       %{name} = %{version}-%{release}
 ### HSH
 #%define gold_archs %ix86 %arm aarch64 x86_64 ppc ppc64 %sparc
+%define gold_archs 0
 
 %description gold
 gold is an ELF linker.	It is intended to have complete support for ELF
@@ -195,9 +196,9 @@ echo "HSH start configure"
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
 	--enable-plugins
 #	--enable-plugins \
-%if 0 ### HSH %ifarch %gold_archs
-	--enable-gold \
-%endif
+#%if 0 ### HSH %ifarch %gold_archs
+#	--enable-gold \
+#%endif
 #	--enable-shared
 make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
@@ -249,9 +250,9 @@ TARGET_OS=%{TARGET}-tizen-linux
 %endif
 ../configure CFLAGS="${RPM_OPT_FLAGS}" \
   --enable-plugins \
-%if 0  ##HSH %ifarch %gold_archs
-  --enable-gold \
-%endif
+#%if 0  ##HSH %ifarch %gold_archs
+#  --enable-gold \
+#%endif
   --prefix=%{_prefix} \
   --with-bugurl=http://bugs.opensuse.org/ \
   --with-pkgversion="GNU Binutils; %{DIST}" \
@@ -312,10 +313,10 @@ echo "HSH make install end"
 cd build-dir
 %if 0%{!?cross:1}
 # installing native binutils
-%if 0 ###HSH %ifarch %gold_archs
-make DESTDIR=$RPM_BUILD_ROOT install-gold
-ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
-%endif
+#%if 0 ###HSH %ifarch %gold_archs
+#make DESTDIR=$RPM_BUILD_ROOT install-gold
+#ln -sf ld.gold $RPM_BUILD_ROOT%{_bindir}/gold
+#%endif
 
 make DESTDIR=$RPM_BUILD_ROOT install-info install
 make -C gas/doc DESTDIR=$RPM_BUILD_ROOT install-info-am install-am
@@ -336,9 +337,9 @@ ln -s "%_sysconfdir/alternatives/ld" "%buildroot/%_bindir/ld";
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
 ln -sf ../../bin/{ar,as,ld,nm,ranlib,strip} $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
-%if 0 ### HSH %ifarch %gold_archs
-ln -sf ../../bin/ld.gold $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
-%endif
+#%if 0 ### HSH %ifarch %gold_archs
+#ln -sf ../../bin/ld.gold $RPM_BUILD_ROOT%{_prefix}/%{HOST}/bin
+#%endif
 
 mv $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts $RPM_BUILD_ROOT%{_libdir}
 ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
@@ -362,9 +363,9 @@ cd ..
 #%find_lang ld binutils.lang
 #%find_lang opcodes binutils.lang
 #%find_lang gprof binutils.lang
-%ifarch %gold_archs
+#%ifarch %gold_archs
 #%find_lang gold binutils-gold.lang
-%endif
+#%endif
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}
 install -m 644 binutils/NEWS $RPM_BUILD_ROOT%{_docdir}/%{name}/NEWS-binutils
 install -m 644 gas/NEWS $RPM_BUILD_ROOT%{_docdir}/%{name}/NEWS-gas
@@ -403,9 +404,9 @@ cd $RPM_BUILD_DIR/binutils-%version
 "%_sbindir/update-alternatives" --install \
     "%_bindir/ld" ld "%_bindir/ld.bfd" 1
 
-%post gold
-"%_sbindir/update-alternatives" --install \
-    "%_bindir/ld" ld "%_bindir/ld.gold" 2
+#%post gold
+#"%_sbindir/update-alternatives" --install \
+#    "%_bindir/ld" ld "%_bindir/ld.gold" 2
 
 
 %preun
@@ -413,10 +414,10 @@ if [ "$1" = 0 ]; then
     "%_sbindir/update-alternatives" --remove ld "%_bindir/ld.bfd";
 fi;
 
-%preun gold
-if [ "$1" = 0 ]; then
-    "%_sbindir/update-alternatives" --remove ld "%_bindir/ld.gold";
-fi;
+#%preun gold
+#if [ "$1" = 0 ]; then
+#    "%_sbindir/update-alternatives" --remove ld "%_bindir/ld.gold";
+#fi;
 
 %endif
 
