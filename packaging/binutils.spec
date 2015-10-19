@@ -273,6 +273,22 @@ make -k check CFLAGS="-O2 -g" CXXFLAGS="-O2 -g" || %{make_check_handling}
 make -k check CFLAGS="$RPM_OPT_FLAGS -Wno-unused -Wno-unprototyped-calls" || :
 %endif
 
+
+### HSH
+echo "HSH make install"
+make install
+echo "HSH make install end"
+### HSH end
+
+%files 
+%manifest %{name}.manifest
+%defattr(-,root,root)
+%{_prefix}/%{TARGET}*
+%{_prefix}/bin/*
+
+### HSH disable make install and file part 
+%if 0
+
 %install
 cd build-dir
 %if 0%{!?cross:1}
@@ -430,5 +446,8 @@ fi;
 %{_libdir}/lib*.*a
 %{_datadir}/gdb/*
 %endif
+
+### HSH disable make install and file part 
+%endif 
 
 %changelog
