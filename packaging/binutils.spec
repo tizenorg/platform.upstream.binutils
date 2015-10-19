@@ -118,6 +118,9 @@ echo "HSH confifure"
 #%define TARGET_PREFIX=$PREFIX/$TARGET
 #%define PATH=$PATH:$PREFIX/bin 
 
+mkdir build-dir
+cd build-dir
+
 ../configure --target=%{TARGET} --prefix=%{_prefix} \
     --program-prefix=%{TARGET} \
     --disable-nls --with-abi=aapcs-linux
