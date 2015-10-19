@@ -289,11 +289,13 @@ make -k check CFLAGS="$RPM_OPT_FLAGS -Wno-unused -Wno-unprototyped-calls" || :
 
 
 ### HSH
+%if 0
 %install
 echo "HSH make install"
 cd build-dir
 make install
 echo "HSH make install end"
+%endif
 ### HSH end
 
 %files 
