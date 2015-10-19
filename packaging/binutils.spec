@@ -192,11 +192,12 @@ echo "HSH start configure"
 
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
-	--enable-plugins \
-%ifarch %gold_archs
-	--enable-gold \
-%endif
-	--enable-shared
+	--enable-plugins
+#	--enable-plugins \
+#%ifarch %gold_archs
+#	--enable-gold \
+#%endif
+#	--enable-shared
 make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
 rm bfd/Makefile
