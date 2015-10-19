@@ -108,6 +108,11 @@ sed -i -e '/BFD_VERSION_DATE/s/$/-%(echo %release | sed 's/\.[0-9]*$//')/' bfd/v
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -DBFD_PLUGIN_LTO_NAME=liblto_plugin_%{_arch}.so"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wno-error"
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS |sed -e 's/atom/i686/g'`
+
+
+#### HSH
+%if 0
+
 %if 0%{!?cross:1}
 # Building native binutils
 echo "Building native binutils." 
@@ -157,6 +162,23 @@ export CONFIG_SHELL="/bin/bash"
 export SHELL="/bin/bash"
 %endif
 
+
+### HSH
+echo "HSH confifure"
+
+%define TARGET aarch64-linux
+#%define PREFIX=/home//work/cross-toolchain-spin-aarch64
+#%define TARGET_PREFIX=$PREFIX/$TARGET
+#%define PATH=$PATH:$PREFIX/bin 
+
+../configure --target=%{TARGET} --prefix=%{_prefix} \
+    --program-prefix=%{TARGET} \
+    --disable-nls --with-abi=aapcs-linux
+make -j8
+
+echo "HSH confifure end"
+
+%if 0
 ../configure %common_flags \
 	${EXTRA_TARGETS:+--enable-targets="${EXTRA_TARGETS#,}"} \
 	--enable-plugins \
@@ -168,6 +190,9 @@ make %{?_smp_mflags} all-bfd TARGET-bfd=headers
 # force reconfiguring (???)
 rm bfd/Makefile
 make %{?_smp_mflags}
+
+%endif 
+###HSH
 
 %else
 # building cross-TARGET-binutils
