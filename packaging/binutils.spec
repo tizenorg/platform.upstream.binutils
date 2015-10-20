@@ -443,7 +443,8 @@ fi;
 #%exclude %{_bindir}/*gold
 #%endif
 %doc %{_infodir}/*.gz
-%{_libdir}/lib*-%{version}*.so
+### HSH
+#%{_libdir}/lib*-%{version}*.so
 %else
 %{_prefix}/%{TARGET}*
 %{_prefix}/bin/*
