@@ -297,14 +297,16 @@ echo "HSH make install"
 cd build-dir
 make install
 echo "HSH make install end"
-%endif
-### HSH end
 
 %files 
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %{_prefix}/%{TARGET}*
 %{_prefix}/bin/*
+
+%endif
+### HSH end
+
 
 ### HSH disable make install and file part 
 #%if 0
@@ -394,7 +396,9 @@ rm -f $RPM_BUILD_ROOT%{_bindir}/gcore*
 rm -rf $RPM_BUILD_ROOT%{_datadir}/gdb
 
 > ../binutils.lang
+
 %endif
+
 cd $RPM_BUILD_DIR/binutils-%version
 
 
@@ -431,9 +435,9 @@ fi;
 %ghost %_sysconfdir/alternatives/ld
 %{_libdir}/ldscripts
 %{_bindir}/*
-%if 0 ### HSH %ifarch %gold_archs
-%exclude %{_bindir}/*gold
-%endif
+#%if 0 ### HSH %ifarch %gold_archs
+#%exclude %{_bindir}/*gold
+#%endif
 %doc %{_infodir}/*.gz
 %{_libdir}/lib*-%{version}*.so
 %else
@@ -441,21 +445,22 @@ fi;
 %{_prefix}/bin/*
 %endif
 
-%if 0 ### HSH %ifarch %gold_archs
-%files gold 
-%manifest %{name}.manifest
-%defattr(-,root,root)
-%{_bindir}/*gold
-%if 0%{?cross:1}
-%if "%{TARGET}" == "arm"
-%{_prefix}/%{TARGET}-tizen-linux-gnueabi/bin/*gold
-%else
-%{_prefix}/%{TARGET}-tizen-linux/bin/*gold
-%endif
-%else
-%{_prefix}/%{HOST}/bin/*gold
-%endif
-%endif
+#%if 0 ### HSH %ifarch %gold_archs
+#%files gold 
+#%manifest %{name}.manifest
+#%defattr(-,root,root)
+#%{_bindir}/*gold
+#%if 0%{?cross:1}
+#%if "%{TARGET}" == "arm"
+#%{_prefix}/%{TARGET}-tizen-linux-gnueabi/bin/*gold
+#%else
+#%{_prefix}/%{TARGET}-tizen-linux/bin/*gold
+#%endif
+#%else
+#%{_prefix}/%{HOST}/bin/*gold
+#%endif
+
+#%endif
 
 %if 0%{!?cross:1}
 %files devel
