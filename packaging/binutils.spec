@@ -352,8 +352,11 @@ ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
 #install -m 644 libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}
 
 #
-chmod a+x $RPM_BUILD_ROOT%{_libdir}/libbfd-*
-chmod a+x $RPM_BUILD_ROOT%{_libdir}/libopcodes-*
+### HSH
+#chmod a+x $RPM_BUILD_ROOT%{_libdir}/libbfd-*
+#chmod a+x $RPM_BUILD_ROOT%{_libdir}/libopcodes-*
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/libbfd*
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/libopcodes*
 # No shared linking outside binutils
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes,inproctrace}.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.la
