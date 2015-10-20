@@ -346,9 +346,11 @@ mv $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts $RPM_BUILD_ROOT%{_libdir}
 ln -sf ../../%{_lib}/ldscripts $RPM_BUILD_ROOT%{_prefix}/%{HOST}/lib/ldscripts
 
 # Install header files
-make -C libiberty install_to_libdir target_header_dir=/usr/include DESTDIR=$RPM_BUILD_ROOT
+### HSH
+#make -C libiberty install_to_libdir target_header_dir=/usr/include DESTDIR=$RPM_BUILD_ROOT
 # We want the PIC libiberty.a
-install -m 644 libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}
+#install -m 644 libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}
+
 #
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/libbfd-*
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/libopcodes-*
