@@ -1,3 +1,6 @@
+%define cross armv7l
+%define armv7l 1
+
 %ifarch armv7l
 %define ARCH armv7l
 %define ABI eabi
