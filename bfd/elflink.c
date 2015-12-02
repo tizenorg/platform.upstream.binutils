@@ -10547,6 +10547,7 @@ bfd_elf_final_link (bfd *abfd, struct bfd_link_info *info)
       for (p = o->map_head.link_order; p != NULL; p = p->next)
 	{
 	  unsigned int reloc_count = 0;
+	  unsigned int additional_reloc_count = 0;
 	  struct bfd_elf_section_data *esdi = NULL;
 
 	  if (p->type == bfd_section_reloc_link_order
@@ -10575,7 +10576,15 @@ bfd_elf_final_link (bfd *abfd, struct bfd_link_info *info)
 		   reloc sections themselves can't have relocations.  */
 		reloc_count = 0;
 	      else if (info->relocatable || info->emitrelocations)
-		reloc_count = sec->reloc_count;
+		{
+		  reloc_count = sec->reloc_count;
+		  if (bed->elf_backend_count_additional_relocs)
+		    {
+		      int c;
+		      c = (*bed->elf_backend_count_additional_relocs) (sec);
+		      additional_reloc_count += c;
+		    }
+		}
 	      else if (bed->elf_backend_count_relocs)
 		reloc_count = (*bed->elf_backend_count_relocs) (info, sec);
 
@@ -10624,15 +10633,22 @@ bfd_elf_final_link (bfd *abfd, struct bfd_link_info *info)
 	  if (reloc_count == 0)
 	    continue;
 
+	  reloc_count += additional_reloc_count;
 	  o->reloc_count += reloc_count;
 
 	  if (p->type == bfd_indirect_link_order
 	      && (info->relocatable || info->emitrelocations))
 	    {
 	      if (esdi->rel.hdr)
-		esdo->rel.count += NUM_SHDR_ENTRIES (esdi->rel.hdr);
+		{
+		  esdo->rel.count += NUM_SHDR_ENTRIES (esdi->rel.hdr);
+		  esdo->rel.count += additional_reloc_count;
+		}
 	      if (esdi->rela.hdr)
-		esdo->rela.count += NUM_SHDR_ENTRIES (esdi->rela.hdr);
+		{
+		  esdo->rela.count += NUM_SHDR_ENTRIES (esdi->rela.hdr);
+		  esdo->rela.count += additional_reloc_count;
+		}
 	    }
 	  else
 	    {

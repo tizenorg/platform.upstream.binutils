@@ -2709,6 +2709,7 @@ typedef struct _arm_elf_section_data
   /* Information about CPU errata.  */
   unsigned int erratumcount;
   elf32_vfp11_erratum_list *erratumlist;
+  unsigned int additional_reloc_count;
   /* Information about unwind tables.  */
   union
   {
@@ -10917,6 +10918,8 @@ insert_cantunwind_after(asection *text_sec, asection *exidx_sec)
     &exidx_arm_data->u.exidx.unwind_edit_tail,
     INSERT_EXIDX_CANTUNWIND_AT_END, text_sec, UINT_MAX);
 
+  exidx_arm_data->additional_reloc_count++;
+
   adjust_exidx_size(exidx_sec, 8);
 }
 
@@ -11059,7 +11062,7 @@ elf32_arm_fix_exidx_coverage (asection **text_section_order,
 	  else
 	    unwind_type = 2;
 
-	  if (elide)
+	  if (elide && !info->relocatable)
 	    {
 	      add_unwind_table_edit (&unwind_edit_head, &unwind_edit_tail,
 				     DELETE_EXIDX_ENTRY, NULL, j / 8);
@@ -11086,7 +11089,8 @@ elf32_arm_fix_exidx_coverage (asection **text_section_order,
     }
 
   /* Add terminating CANTUNWIND entry.  */
-  if (last_exidx_sec && last_unwind_type != 0)
+  if (!info->relocatable && last_exidx_sec
+      && last_unwind_type != 0)
     insert_cantunwind_after(last_text_sec, last_exidx_sec);
 
   return TRUE;
@@ -15508,6 +15512,39 @@ make_branch_to_a8_stub (struct bfd_hash_entry *gen_entry,
   return TRUE;
 }
 
+static void
+elf32_arm_add_relocation (bfd *output_bfd, struct bfd_link_info *info,
+			  asection *output_sec, Elf_Internal_Rela *rel)
+{
+  BFD_ASSERT(output_sec && rel);
+  struct bfd_elf_section_reloc_data *output_reldata;
+  struct elf32_arm_link_hash_table *htab;
+  struct bfd_elf_section_data *oesd = elf_section_data (output_sec);
+  Elf_Internal_Shdr *rel_hdr;
+
+
+  if (oesd->rel.hdr)
+    {
+      rel_hdr = oesd->rel.hdr;
+      output_reldata = &(oesd->rel);
+    }
+  else if (oesd->rela.hdr)
+    {
+      rel_hdr = oesd->rela.hdr;
+      output_reldata = &(oesd->rela);
+    }
+  else
+    {
+      abort ();
+    }
+
+  bfd_byte *erel = rel_hdr->contents;
+  erel += output_reldata->count * rel_hdr->sh_entsize;
+  htab = elf32_arm_hash_table (info);
+  SWAP_RELOC_OUT(htab) (output_bfd, rel, erel);
+  output_reldata->count++;
+}
+
 /* Do code byteswapping.  Return FALSE afterwards so that the section is
    written out as normal.  */
 
@@ -15668,6 +15705,26 @@ elf32_arm_write_section (bfd *output_bfd,
 			   usual BFD method.  */
 			prel31_offset = (text_offset - exidx_offset)
 					& 0x7ffffffful;
+			if (link_info->relocatable)
+			  {
+			    /* Here relocation for new EXIDX_CANTUNWIND is
+			       created, so there is no need to
+			       adjust offset by hand. */
+			    prel31_offset = text_sec->output_offset
+					    + text_sec->size;
+
+			    /* New relocation entity */
+			    asection *text_out = text_sec->output_section;
+			    Elf_Internal_Rela rel;
+			    rel.r_addend = 0;
+			    rel.r_offset = exidx_offset;
+			    rel.r_info = ELF32_R_INFO (text_out->target_index,
+						       R_ARM_PREL31);
+
+			    elf32_arm_add_relocation (output_bfd, link_info,
+						      sec->output_section,
+						      &rel);
+			  }
 
 			/* First address we can't unwind.  */
 			bfd_put_32 (output_bfd, prel31_offset,
@@ -16135,6 +16192,16 @@ elf32_arm_get_synthetic_symtab (bfd *abfd,
   return n;
 }
 
+static unsigned int
+elf32_arm_count_additional_relocs (asection *sec)
+{
+  struct _arm_elf_section_data *arm_data;
+
+  arm_data = get_arm_elf_section_data (sec);
+
+  return arm_data->additional_reloc_count;
+}
+
 #define ELF_ARCH			bfd_arch_arm
 #define ELF_TARGET_ID			ARM_ELF_DATA
 #define ELF_MACHINE_CODE		EM_ARM
@@ -16189,6 +16256,7 @@ elf32_arm_get_synthetic_symtab (bfd *abfd,
 #define elf_backend_output_arch_local_syms      elf32_arm_output_arch_local_syms
 #define elf_backend_begin_write_processing      elf32_arm_begin_write_processing
 #define elf_backend_add_symbol_hook		elf32_arm_add_symbol_hook
+#define elf_backend_count_additional_relocs	elf32_arm_count_additional_relocs
 
 #define elf_backend_can_refcount       1
 #define elf_backend_can_gc_sections    1
