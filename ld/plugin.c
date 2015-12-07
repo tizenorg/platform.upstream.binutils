@@ -81,9 +81,6 @@ static plugin_t **plugins_tail_chain_ptr = &plugins_list;
 /* The last plugin added to the list, for receiving args.  */
 static plugin_t *last_plugin = NULL;
 
-/* This is set when we ignored last plugin */
-static bfd_boolean last_plugin_ignored;
-
 /* The tail of the arg chain of the last plugin added to the list.  */
 static plugin_arg_t **last_plugin_args_tail_chain_ptr = NULL;
 
@@ -199,15 +196,8 @@ plugin_opt_plugin (const char *plugin)
   memset (newplug, 0, sizeof *newplug);
   newplug->name = plugin;
   newplug->dlhandle = dlopen (plugin, RTLD_NOW);
-  if (!newplug->dlhandle){
-#ifdef IGNORE_MISSING_PLUGINS
-    einfo (_("%P: %s: error loading plugin: %s\n"), plugin, dlerror ());
-    last_plugin_ignored=TRUE;
-    return;
-#else
+  if (!newplug->dlhandle)
     einfo (_("%P%F: %s: error loading plugin: %s\n"), plugin, dlerror ());
-#endif
-  }
 
   /* Chain on end, so when we run list it is in command-line order.  */
   *plugins_tail_chain_ptr = newplug;
@@ -216,9 +206,6 @@ plugin_opt_plugin (const char *plugin)
   /* Record it as current plugin for receiving args.  */
   last_plugin = newplug;
   last_plugin_args_tail_chain_ptr = &newplug->args;
-#ifdef IGNORE_MISSING_PLUGINS
-  last_plugin_ignored=FALSE;
-#endif
 }
 
 /* Accumulate option arguments for last-loaded plugin, or return
@@ -226,11 +213,6 @@ plugin_opt_plugin (const char *plugin)
 int
 plugin_opt_plugin_arg (const char *arg)
 {
-#ifdef IGNORE_MISSING_PLUGINS
-  /* Ignore options for ignored plugin */
-  if (last_plugin_ignored)
-    return 0;
-#endif
   plugin_arg_t *newarg;
 
   if (!last_plugin)
