@@ -19,6 +19,10 @@
 
 %define target_arch %{target_cpu}-tizen-linux-gnu%{?target_abi}
 
+%if 0%{?run_tests}
+%define binutils_run_tests 1
+%endif
+
 Name:           binutils%{?cross:-%{cross}}
 BuildRequires:  makeinfo
 BuildRequires:  bison
@@ -26,6 +30,13 @@ BuildRequires:  flex
 BuildRequires:  ncurses-devel
 BuildRequires:  zlib-devel
 BuildRequires:  gcc-c++
+# here we use %%if because OBS spec parser cannot expand
+# %%{?macro:...} correctly
+%if 0%{?binutils_run_tests}
+BuildRequires: dejagnu
+BuildRequires: expect
+BuildRequires: gdb
+%endif
 Version:        2.25
 Release:        0
 Url:            http://www.gnu.org/software/binutils/
@@ -63,6 +74,13 @@ This package includes header files and static libraries necessary to
 build programs which use the GNU BFD library, which is part of
 binutils.
 
+%package testresults
+Summary:       Testsuite results
+License:       SUSE-Public-Domain
+Group:         Development/Languages
+%description testresults
+Results from running %{name} testsuites.
+
 
 %prep
 %setup -q -n binutils-%{version}
@@ -98,6 +116,14 @@ cd build-dir
 	--enable-shared
 
 make %{?_smp_mflags}
+%{?binutils_run_tests:
+  echo "Run testsuite"
+  # asan needs a whole shadow address space
+  ulimit -v unlimited || true
+  make -k check %{?_smp_mflags} || true
+  mkdir ../testresults
+  #../contrib/test_summary | tee ../testresults/test_summary.txt
+}
 
 %install
 cd build-dir
@@ -114,6 +140,12 @@ do
   cp %{buildroot}%{_bindir}/%{target_arch}-$binary %{buildroot}%{_prefix}/%{target_arch}/bin/$binary
 }
 done
+
+%{?binutils_run_tests:
+  cp `find . -name "*.sum"` ../testresults/
+  cp `find . -name "*.log"  \! -name "config.log" | grep -v 'acats.\?/tests' ` ../testresults/
+  chmod 644 ../testresults/*
+}
 
 # Remove unwanted files to shut up rpm
 %{remove_docs}
@@ -152,6 +184,14 @@ rm -rf %{buildroot}%{_datadir}
 %defattr(-,root,root)
 %{_bindir}/ld.gold
 %{_prefix}/%{target_arch}/bin/ld.gold
+}
+
+%{?binutils_run_tests:
+%files testresults
+%defattr(-,root,root)
+%doc testresults/test_summary.txt
+%doc testresults/*.sum
+%doc testresults/*.log
 }
 
 %changelog
