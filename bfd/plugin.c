@@ -294,6 +294,7 @@ load_plugin (bfd *abfd)
     {
       char *full_name;
       struct stat s;
+
       full_name = concat (p, "/", ent->d_name, NULL);
       if (stat(full_name, &s) == 0 && S_ISREG (s.st_mode))
 	found = try_load_plugin (full_name, abfd);
