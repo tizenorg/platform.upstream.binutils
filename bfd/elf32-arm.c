@@ -11035,6 +11035,17 @@ elf32_arm_fix_exidx_coverage (asection **text_section_order,
 	/* An error?  */
 	continue;
 
+      if (last_unwind_type > 0)
+	{
+	  /* Check if first unwind item is not pointing to section start.  */
+	  unsigned int first_word = bfd_get_32 (ibfd, contents);
+	  if (first_word != sec->vma)
+	    {
+	      insert_cantunwind_after(last_text_sec, last_exidx_sec);
+	      last_unwind_type = 0;
+	    }
+	}
+
       for (j = 0; j < hdr->sh_size; j += 8)
 	{
 	  unsigned int second_word = bfd_get_32 (ibfd, contents + j + 4);
